@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # Chave de API ativa
-API_KEY = "AIzaSyAaWkSfthV75dI0WehpBNYJCQJB6rulcqU"
+API_KEY = st.secrets["GEMINI_API_KEY"]
 
 # =========================================================================
 # 1. MOTORES DE CÁLCULO INTERNOS
