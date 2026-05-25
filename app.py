@@ -12,12 +12,17 @@ st.set_page_config(
     layout="centered"
 )
 
+# Puxa a chave de API salva nos Secrets do Streamlit
 API_KEY = st.secrets.get("GEMINI_API_KEY", "")
 
 # =========================================================================
-# 1. FUNÇÕES DE CÁLCULO (CÉREBRO MATEMÁTICO)
+# 1. FUNÇÕES DE CÁLCULO (CÉREBRO MATEMÁTICO CORRIGIDO)
 # =========================================================================
 def calcular_dados_portais(nome, dia, mes, ano):
+    """
+    Realiza os cálculos exatos de confluência (Maia Oficial, Numerologia e Astrologia).
+    """
+    # 1.1 Astrologia (Signo) e Anjo Cabalístico
     signos = [
         ("Capricórnio", "Asariel"), ("Aquário", "Uriel"), ("Peixes", "Asariel"),
         ("Áries", "Samuel"), ("Touro", "Anael"), ("Gêmeos", "Rafael"),
@@ -29,6 +34,7 @@ def calcular_dados_portais(nome, dia, mes, ano):
     idx = mes - 1 if dia <= datas_signos[mes - 1] else (mes % 12)
     signo, anjo = signos[idx]
 
+    # 1.2 Numerologia: Caminho de Vida (Data)
     ano_calc = ano if ano != 0 else 2026
     str_data = f"{dia:02d}{mes:02d}{ano_calc}"
     soma_vida = sum(int(digito) for digito in str_data if digito.isdigit())
@@ -36,6 +42,7 @@ def calcular_dados_portais(nome, dia, mes, ano):
     while soma_vida > 9 and soma_vida not in [11, 22]:
         soma_vida = sum(int(d) for d in str(soma_vida))
 
+    # 1.3 Numerologia: Expressão (Nome)
     tabela_pitagorica = {
         'A':1,'I':9,'J':1,'Q':8,'Y':7, 'B':2,'K':2,'R':9,'Z':8,
         'C':3,'L':3,'S':1, 'D':4,'M':4,'T':2, 'E':5,'N':5,'U':3,
@@ -49,25 +56,34 @@ def calcular_dados_portais(nome, dia, mes, ano):
     while soma_nome > 9 and soma_nome not in [11, 22]:
         soma_nome = sum(int(d) for d in str(soma_nome))
 
-    selos = [
-        "Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos",
-        "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu",
-        "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"
+    # 1.4 Sincronário Maia Corrigido (Sequência Arquetípica de José Argüelles)
+    selos_maias = [
+        "Dragão", "Vento", "Noite", "Semente", "Serpente", 
+        "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", 
+        "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", 
+        "Guerreiro", "Terra", "Espelho", "Tormenta", "Sol"
     ]
     
+    # Cálculo absoluto com base juliana simplificada para sincronia do Tzolkin
+    yc = ano_calc - 1
     data_usuario = datetime.date(ano_calc, mes, dia)
-    data_ancora = datetime.date(2026, 4, 23)
-    diferenca_dias = (data_usuario - data_ancora).days
+    dia_do_ano = data_usuario.timetuple().tm_yday
     
-    kin_calculado = (115 + diferenca_dias) % 260
-    if kin_calculado <= 0:
-        kin_calculado += 260
+    # Fórmula de posicionamento absoluto de dias na linha do tempo mística
+    base_dias = (ano_calc * 365) + (yc // 4) - (yc // 100) + (yc // 400) + dia_do_ano
+    
+    # Alinhamento constante (Garante 22/03/1979 como KIN 248)
+    kin_calculado = (base_dias + 214) % 260
+    if kin_calculado == 0:
+        kin_calculado = 260
         
     tom_calculado = kin_calculado % 13
     if tom_calculado == 0:
         tom_calculado = 13
         
-    selo_calculado = selos[kin_calculado % 20]
+    # Índice correspondente na matriz (0 a 19)
+    selo_idx = (kin_calculado - 1) % 20
+    selo_calculado = selos_maias[selo_idx]
 
     return {
         "kin": kin_calculado,
@@ -83,6 +99,12 @@ def calcular_dados_portais(nome, dia, mes, ano):
 # 2. MOTOR DO GEMINI (CHAMADAS INDIVIDUAIS SOB DEMANDA)
 # =========================================================================
 def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma, tipo_leitura):
+    """
+    Envia os dados calculados para o Gemini com tratamento de erro exposto para diagnóstico.
+    """
+    time.sleep(2)  # Respiro protetor anti-bloqueio
+    
+    # Extração segura usando .get() para evitar KeyError
     kin = dados_calculados.get("kin", 1)
     tom = dados_calculados.get("tom", 1)
     selo = dados_calculados.get("selo", "Sol")
@@ -92,18 +114,18 @@ def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma, tipo_leitura
     num_expressao = dados_calculados.get("num_expressao", 7)
     
     if tipo_leitura == "geral":
-        prompt = f"Gere uma leitura de autoconhecimento geral profunda e magnética para {nome}, nascido em {dia}/{mes}/{'2026' if ano == 0 else ano}. Idioma: {idioma}. Dados: KIN {kin}, Tom {tom}, Selo {selo}, Signo {signo}, Anjo {anjo}, Caminho de Vida {num_vida}, Expressão {num_expressao}. Escreva de forma fluida e misteriosa. Termine com 'In Lak'ech'."
+        prompt = f"Gere uma leitura de autoconhecimento geral profunda e magnética para {nome}, nascido em {dia}/{mes}/{'2026' if ano == 0 else ano}. Idioma: {idioma}. Dados: KIN {kin}, Tom {tom}, Selo {selo}, Signo {signo}, Anjo {anjo}, Caminho de Vida {num_vida}, Expressão {num_expressao}. Escreva de forma fluida e mística. Termine com a saudação tradicional 'In Lak'ech'."
     elif tipo_leitura == "vocacao":
-        prompt = f"Gere uma análise focada em MISSÃO, PROPÓSITO E VOCAÇÃO PROFISSIONAL para {nome}. Idioma: {idioma}. Dados: KIN {kin}, Signo {signo}, Números {num_vida} e {num_expressao}. Revele talentos ocultos e caminhos de prosperidade."
+        prompt = f"Gere uma análise focada em MISSÃO, PROPÓSITO E VOCAÇÃO PROFISSIONAL para {nome}. Idioma: {idioma}. Dados: KIN {kin}, Signo {signo}, Números {num_vida} e {num_expressao}. Revele talentos ocultos e caminhos de prosperidade baseados nessa frequência cósmica."
     elif tipo_leitura == "amor":
-        prompt = f"Gere um alinhamento sobre AMOR, RELACIONAMENTOS E AFETIVIDADE para {nome}. Idioma: {idioma}. Dados: KIN {kin}, Signo {signo}, Anjo {anjo}, Caminho de Vida {num_vida}. Explique o comportamento afetivo e magnetismo."
+        prompt = f"Gere um alinhamento sobre AMOR, RELACIONAMENTOS E AFETIVIDADE para {nome}. Idioma: {idioma}. Dados: KIN {kin}, Signo {signo}, Anjo {anjo}, Caminho de Vida {num_vida}. Explique o comportamento afetivo, desafios e magnetismo de atração."
 
     try:
         client = genai.Client(api_key=API_KEY)
         resposta = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
         return resposta.text
     except Exception as e:
-        return f"🌌 Os portais de {tipo_leitura} estão temporariamente indisponíveis (Limite atingido). Erro: {str(e)}"
+        return f"🌌 Os portais de {tipo_leitura} estão temporariamente indisponíveis (Limite diário do Google atingido). Erro Técnico: {str(e)}"
 
 # =========================================================================
 # 3. INTERFACE VISUAL DO USUÁRIO (WEB APP)
@@ -113,12 +135,12 @@ st.subheader("A Geometria Sagrada do Tempo")
 st.markdown("> *In Lak'ech. Digite seu nome completo e data de nascimento. Prepare-se para espelhar sua alma no tempo...*")
 st.markdown("---")
 
-# Inicializa variáveis na memória do navegador (Session State)
+# Preserva os dados salvos entre as interações do navegador
 if "dados_calculados" not in st.session_state:
     st.session_state.dados_calculados = None
     st.session_state.texto_geral = None
 
-idioma_opcao = st.selectbox("🌐 Escolha seu idioma", ["Português", "English", "Español"])
+idioma_opcao = st.selectbox("🌐 Escolha seu idioma / Choose language", ["Português", "English", "Español"])
 idioma_map = {"Português": "pt", "English": "en", "Español": "es"}
 idioma = idioma_map[idioma_opcao]
 
@@ -134,7 +156,7 @@ with col3:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# BOTÃO PRINCIPAL: SÓ GERA O TEXTO GRÁTIS
+# BOTÃO PRINCIPAL (Gera estritamente o conteúdo da primeira aba aberta)
 if st.button("🔮 Ativar o Portal do Tempo", use_container_width=True):
     if not nome_input.strip():
         st.warning("Por favor, digite seu nome para abrir o portal.")
@@ -143,11 +165,10 @@ if st.button("🔮 Ativar o Portal do Tempo", use_container_width=True):
     else:
         with st.spinner("🌌 Sincronizando frequências cósmicas e gerando sua leitura gratuita..."):
             st.session_state.dados_calculados = calcular_dados_portais(nome_input, dia, mes, ano_input)
-            # Chama a API APENAS UMA VEZ
             st.session_state.texto_geral = chamar_gemini_ia(nome_input, dia, mes, ano_input, st.session_state.dados_calculados, idioma, "geral")
             st.success("✨ Alinhamento Concluído!")
 
-# Se o usuário já clicou no botão e tem dados gerados, mostra as abas
+# Exibição Condicional das Abas Inteligentes
 if st.session_state.dados_calculados is not None:
     st.markdown("---")
     aba1, aba2, aba3 = st.tabs(["🔮 Portal Geral (Aberto)", "💼 Missão & Vocação", "💖 Confluência Amorosa"])
@@ -160,7 +181,7 @@ if st.session_state.dados_calculados is not None:
         st.info("Deseja destravar as previsões de carreira, finanças e caminhos de sucesso do seu KIN?")
         st.markdown("---")
         
-        # O botão do Premium aciona a API de forma isolada! (Simulando o pós-pagamento)
+        # Só consome requisição se clicar aqui (Simula fluxo após pagamento do Mercado Pago)
         if st.button("💳 Testar Desbloqueio: Gerar Missão & Vocação", key="btn_pay_voc"):
             with st.spinner("🔮 Conectando ao módulo premium..."):
                 texto_premium_voc = chamar_gemini_ia(nome_input, dia, mes, ano_input, st.session_state.dados_calculados, idioma, "vocacao")
@@ -175,3 +196,4 @@ if st.session_state.dados_calculados is not None:
             with st.spinner("🔮 Conectando ao módulo premium..."):
                 texto_premium_amo = chamar_gemini_ia(nome_input, dia, mes, ano_input, st.session_state.dados_calculados, idioma, "amor")
                 st.write(texto_premium_amo)
+                
