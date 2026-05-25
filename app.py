@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import date
 from google import genai
+import os
 
 # =========================================================================
 # CONFIGURAÇÃO DA PÁGINA (DESIGN E INTERFACE)
@@ -11,7 +12,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Chave de API ativa
+# Puxa a chave de forma segura do painel do Streamlit
 API_KEY = st.secrets["GEMINI_API_KEY"]
 
 # =========================================================================
@@ -97,41 +98,51 @@ def calcular_sincronario(dia, mes, ano):
     return kin_real, tom, selo, f"Dia {d_lua} da Lua {luas[n_lua-1]} (Lua {n_lua})", plasmas[(d_lua-1)%7], cores[((d_lua - 1) // 7)]
 
 # =========================================================================
-# 2. INTEGRAÇÃO INTELIGENTE COM GEMINI 2.5 (ALTA VELOCIDADE)
+# 2. INTEGRAÇÃO INTELIGENTE COM GEMINI (GERAÇÃO DOS 3 TIPOS DE TEXTO)
 # =========================================================================
-def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma_selecionado):
+def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma_selecionado, tipo_leitura):
     client = genai.Client(api_key=API_KEY)
     
-    prompt = f"""
-    You must write the entire output response strictly in this language: {idioma_selecionado}.
-
-    Atue como um terapeuta arquetípico, mentor espiritual e conselheiro existencial profundo.
-    Sua missão é escrever um perfil revelador, altamente inspirador, moderno e magnético para o consultante.
-    
-    DIRETRIZ DE VOCABULÁRIO IMPORTANTE:
-    - EVITE excesso de termos técnicos maias secos (não fique explicando o que é Tzolkin, Kin base, Selos ou plasmas).
-    - Em vez disso, TRADUZA esses conceitos em FORÇA PSICOLÓGICA, TALENTO REVELADO e DIRECIONAMENTO DE VIDA.
-    - O foco deve ser o impacto emocional e a clareza prática na vida do consultante. Descreva a alma dele, não a engrenagem do cálculo.
-
-    Dados do Consultante:
+    # Base de dados em comum que a IA vai ler
+    dados_perfil = f"""
     - Nome: {nome}
     - Nascimento: {dia:02d}/{mes:02d}/{ano}
-    
-    Dados Técnicos Calculados:
-    - Energia Galáctica Primária: KIN {dados_calculados['kin']} - Tom {dados_calculados['tom']} + Selo {dados_calculados['selo']}
-    - Frequência Temporal do Nascimento: {dados_calculados['info_lua']} + Plasma {dados_calculados['plasma']} + Semana {dados_calculados['semana']}
-    - Alinhamento Astrológico: Sol em {dados_calculados['signo']}
-    - Guardião Espiritual da Cabala: {dados_calculados['anjo']}
-    - Vibração do Caminho de Vida (Destino): {dados_calculados['num_data']}
-    - Vibração dos Talentos Inatos (Expressão): {dados_calculados['num_nome']}
-
-    ESTRUTURA DO TEXTO:
-    - Crie um título poético, contemporâneo e forte na linha: "O Despertar da sua Força Interior: [Nome]" (ou equivalente traduzido).
-    - Escreva um texto corrido (aproximadamente 30 linhas), dividido em parágrafos fluidos e envolventes.
-    - NÃO use listas, tópicos ou bullet points.
-    - Termine com a saudação cósmica universalista "In Lak'ech!".
+    - Energia Galáctica: KIN {dados_calculados['kin']} - Tom {dados_calculados['tom']} + Selo {dados_calculados['selo']}
+    - Frequência Temporal: {dados_calculados['info_lua']} + Plasma {dados_calculados['plasma']}
+    - Astrologia: Sol em {dados_calculados['signo']}
+    - Guardião Espiritual: {dados_calculados['anjo']}
+    - Caminho de Vida (Destino): {dados_calculados['num_data']}
+    - Talentos Inatos (Expressão): {dados_calculados['num_nome']}
     """
 
+    # Personalizando o comando de acordo com o tipo de texto escolhido
+    if tipo_leitura == "geral":
+        prompt = f"""
+        Write strictly in {idioma_selecionado}.
+        Atue como um mentor existencial profundo. Escreva um perfil revelador e inspirador (cerca de 30 linhas).
+        TRADUZA os dados técnicos abaixo em força psicológica e direcionamento de vida de forma fluida.
+        NÃO use listas, tópicos ou bullet points. Crie um título poético forte.
+        Termine com a saudação "In Lak'ech!".
+        Dados do Consultante: {dados_perfil}
+        """
+    elif tipo_leitura == "vocacao":
+        prompt = f"""
+        Write strictly in {idioma_selecionado}.
+        Com base nos dados arquetípicos abaixo, escreva uma análise focada estritamente em VOCAÇÃO PROFISSIONAL, PROSPERIDADE, TALENTOS FINANCEIROS E CARREIRA.
+        O texto deve ser direto, motivador e ter NO MÁXIMO 10 LINHAS.
+        NÃO use tópicos. Crie um título forte focado em Propósito e Trabalho.
+        Dados do Consultante: {dados_perfil}
+        """
+    elif tipo_leitura == "amor":
+        prompt = f"""
+        Write strictly in {idioma_selecionado}.
+        Com base nos dados arquetípicos abaixo, escreva uma análise profunda focada em AFINIDADE AMOROSA, RELACIONAMENTOS, COMO A PESSOA AMA E SE CONECTA AFETIVAMENTE.
+        O texto deve ser magnético, romântico-arquetípico e acolhedor (cerca de 15 a 20 linhas).
+        NÃO use tópicos. Crie um título poético focado em Conexão de Almas e Amor.
+        Dados do Consultante: {dados_perfil}
+        """
+
+    # Executa a chamada
     try:
         resposta = client.models.generate_content(model='gemini-2.5-pro', contents=prompt)
         return resposta.text
@@ -144,35 +155,25 @@ def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma_selecionado):
 # =========================================================================
 st.title("🔮 Sincro App")
 st.subheader("O Despertar do Vórtice Sagrado através do Tempo")
-st.write("Insira os dados do consultante para gerar o perfil arquetípico e evolutivo integrado.")
+st.write("Insira os dados para liberar seu portal do tempo.")
 
 st.markdown("---")
 
 nome_input = st.text_input("Nome Completo do Consultado:")
 
 col1, col2 = st.columns(2)
-
 with col1:
-    data_nascimento = st.date_input(
-        "Data de Nascimento:",
-        min_value=date(1920, 1, 1),
-        max_value=date.today(),
-        value=date(1990, 1, 1)
-    )
-
+    data_nascimento = st.date_input("Data de Nascimento:", min_value=date(1920, 1, 1), max_value=date.today(), value=date(1990, 1, 1))
 with col2:
-    idioma = st.selectbox(
-        "Idioma do Relatório:",
-        ["Português", "English", "Español"]
-    )
+    idioma = st.selectbox("Idioma do Relatório:", ["Português", "English", "Español"])
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-if st.button("✨ Canalizar Leitura Sagrada", use_container_width=True):
+if st.button("✨ Canalizar Leituras do Portal", use_container_width=True):
     if not nome_input.strip():
         st.warning("⚠️ Por favor, digite o nome completo antes de continuar.")
     else:
-        with st.spinner("🌌 Conectando aos portais temporais e estruturando sua leitura..."):
+        with st.spinner("🌌 Conectando aos portais temporais e calculando suas frequências..."):
             
             dia, mes, ano = data_nascimento.day, data_nascimento.month, data_nascimento.year
             kin, tom, selo, info_lua, plasma, semana = calcular_sincronario(dia, mes, ano)
@@ -186,8 +187,32 @@ if st.button("✨ Canalizar Leitura Sagrada", use_container_width=True):
                 "num_data": num_data, "num_nome": num_nome
             }
 
-            texto_final = chamar_gemini_ia(nome_input, dia, mes, ano, dados, idioma)
+            # Gerando a leitura Geral (Amostra Grátis)
+            texto_geral = chamar_gemini_ia(nome_input, dia, mes, ano, dados, idioma, "geral")
+            
+            # Gerando as leituras Premium (que depois serão bloqueadas por pagamento)
+            texto_vocacao = chamar_gemini_ia(nome_input, dia, mes, ano, dados, idioma, "vocacao")
+            texto_amor = chamar_gemini_ia(nome_input, dia, mes, ano, dados, idioma, "amor")
             
             st.markdown("---")
-            st.success("📜 Leitura Gerada com Sucesso!")
-            st.write(texto_final)
+            st.success("📜 Portais Canalizados!")
+            
+            # Criando Abas para organizar os 3 textos na tela de forma elegante
+            aba1, aba2, aba3 = st.tabs(["🌌 Leitura Geral (Livre)", "💼 Missão & Vocação", "💖 Alinhamento Amoroso"])
+            
+            with aba1:
+                st.write(texto_geral)
+                
+            with aba2:
+                st.markdown("### 🔒 Módulo Premium Bloqueado")
+                st.info("Adorou sua leitura? No app oficial, esta seção de Vocação Profissional (até 10 linhas) será desbloqueada via Pix automático!")
+                st.markdown("---")
+                st.write("*Aqui está uma prévia do seu teste atual:*")
+                st.write(texto_vocacao)
+                
+            with aba3:
+                st.markdown("### 🔒 Módulo Premium Bloqueado")
+                st.info("Descubra sua dinâmica afetiva e de atração cósmica desbloqueando este módulo via Pix!")
+                st.markdown("---")
+                st.write("*Aqui está uma prévia do seu teste atual:*")
+                st.write(texto_amor)
