@@ -100,55 +100,77 @@ def calcular_sincronario(dia, mes, ano):
 # =========================================================================
 # 2. INTEGRAÇÃO INTELIGENTE COM GEMINI (GERAÇÃO DOS 3 TIPOS DE TEXTO)
 # =========================================================================
-def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma_selecionado, tipo_leitura):
-    client = genai.Client(api_key=API_KEY)
-    
-    # Base de dados em comum que a IA vai ler
-    dados_perfil = f"""
-    - Nome: {nome}
-    - Nascimento: {dia:02d}/{mes:02d}/{ano}
-    - Energia Galáctica: KIN {dados_calculados['kin']} - Tom {dados_calculados['tom']} + Selo {dados_calculados['selo']}
-    - Frequência Temporal: {dados_calculados['info_lua']} + Plasma {dados_calculados['plasma']}
-    - Astrologia: Sol em {dados_calculados['signo']}
-    - Guardião Espiritual: {dados_calculados['anjo']}
-    - Caminho de Vida (Destino): {dados_calculados['num_data']}
-    - Talentos Inatos (Expressão): {dados_calculados['num_nome']}
-    """
+import time  # Garante que o contador de tempo está ativo para o respiro da API
 
-    # Personalizando o comando de acordo com o tipo de texto escolhido
+def chamar_gemini_ia(nome, dia, mes, ano, dados_calculados, idioma, tipo_leitura):
+    """
+    Função que conecta com a API do Gemini 2.5 Flash para gerar as leituras personalizadas.
+    Inclui um delay de segurança para evitar o erro de limite (ClientError).
+    """
+    # Dá um respiro de 2 segundos antes de chamar a API para o Google não bloquear as abas seguidas
+    time.sleep(2)
+    
+    # Extrai os dados calculados do dicionário
+    kin = dados_calculados["kin"]
+    tom = dados_calculados["tom"]
+    selo = dados_calculados["selo"]
+    signo = dados_calculados["signo"]
+    anjo = dados_calculados["anjo"]
+    num_vida = dados_calculados["num_vida"]
+    num_expressao = dados_calculados["num_expressao"]
+    
+    # Montagem do Prompt personalizado de acordo com a aba (tipo_leitura)
     if tipo_leitura == "geral":
         prompt = f"""
-        Write strictly in {idioma_selecionado}.
-        Atue como um mentor existencial profundo. Escreva um perfil revelador e inspirador (cerca de 30 linhas).
-        TRADUZA os dados técnicos abaixo em força psicológica e direcionamento de vida de forma fluida.
-        NÃO use listas, tópicos ou bullet points. Crie um título poético forte.
-        Termine com a saudação "In Lak'ech!".
-        Dados do Consultante: {dados_perfil}
+        Você é um mestre xamã maia, astrólogo cabalístico e numerólogo pitagórico antigo.
+        Gere uma leitura de autoconhecimento profunda e magnética para {nome}, nascido em {dia}/{mes}/{anjo if ano == 0 else ano}.
+        Idioma da resposta: {idioma}.
+        
+        Use os seguintes dados exatos do perfil dele:
+        - Sincronário Maia: KIN {kin}, Tom {tom}, Selo Solar {selo}.
+        - Astrologia & Cabala: Signo de {signo} guardado pelo Anjo Cabalístico {anjo}.
+        - Numerologia: Caminho de Vida {num_vida} e Número de Expressão {num_expressao}.
+        
+        Esta é a LEITURA GERAL DE ORIGEM. Foque na essência da alma, na energia do tempo no dia em que nasceu e na sua assinatura cósmica. Escreva de forma fluida, misteriosa, "cool" e acolhedora. Termine com a saudação maia tradicional 'In Lak'ech'. Não use formatações genéricas em tópicos simples.
         """
+        
     elif tipo_leitura == "vocacao":
         prompt = f"""
-        Write strictly in {idioma_selecionado}.
-        Com base nos dados arquetípicos abaixo, escreva uma análise focada estritamente em VOCAÇÃO PROFISSIONAL, PROSPERIDADE, TALENTOS FINANCEIROS E CARREIRA.
-        O texto deve ser direto, motivador e ter NO MÁXIMO 10 LINHAS.
-        NÃO use tópicos. Crie um título forte focado em Propósito e Trabalho.
-        Dados do Consultante: {dados_perfil}
+        Você é um mentor de carreira holístico e estrategista de destino.
+        Gere uma análise focada em MISSÃO, PROPÓSITO E VOCAÇÃO PROFISSIONAL para {nome}.
+        Idioma da resposta: {idioma}.
+        
+        Dados do perfil: KIN {kin} ({tom} + {selo}), Signo {signo}, Números {num_vida} e {num_expressao}.
+        
+        Esta é a aba premium de TRABALHO & VOCAÇÃO. Revele quais os talentos ocultos e caminhos de prosperidade financeira que o universo reservou para essa combinação de energias. Seja encorajador, prático e profundo.
         """
+        
     elif tipo_leitura == "amor":
         prompt = f"""
-        Write strictly in {idioma_selecionado}.
-        Com base nos dados arquetípicos abaixo, escreva uma análise profunda focada em AFINIDADE AMOROSA, RELACIONAMENTOS, COMO A PESSOA AMA E SE CONECTA AFETIVAMENTE.
-        O texto deve ser magnético, romântico-arquetípico e acolhedor (cerca de 15 a 20 linhas).
-        NÃO use tópicos. Crie um título poético focado em Conexão de Almas e Amor.
-        Dados do Consultante: {dados_perfil}
+        Você é um conselheiro afetivo ancestral e terapeuta de alma.
+        Gere um alinhamento sobre AMOR, RELACIONAMENTOS E AFETIVIDADE para {nome}.
+        Idioma da resposta: {idioma}.
+        
+        Dados do perfil: KIN {kin}, Signo {signo}, Anjo {anjo}, Caminho de Vida {num_vida}.
+        
+        Esta é a aba premium de RELACIONAMENTOS & MAGNETISMO AFETIVO. Explique como essa pessoa se comporta no amor, o que sua alma busca em um parceiro e como harmonizar seus portais afetivos. Seja poético, magnético e acolhedor.
         """
 
-    # Executa a chamada
+    # Bloco de segurança com tratamento de erro e re-tentativa (Retry)
     try:
-        resposta = client.models.generate_content(model='gemini-2.5-pro', contents=prompt)
-        return resposta.text
-    except:
+        client = genai.Client(api_key=API_KEY)
         resposta = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
         return resposta.text
+    except Exception as e:
+        # Se a API falhar ou der limite (ClientError), espera mais 4 segundos e tenta uma última vez
+        try:
+            time.sleep(4)
+            client = genai.Client(api_key=API_KEY)
+            resposta = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+            return resposta.text
+        except Exception as erro_fatal:
+            # Em vez de derrubar o app com tela vermelha, joga uma mensagem elegante na aba correspondente
+            return f"🌌 Os portais do tempo estão muito congestionados neste momento. Por favor, aguarde alguns instantes e clique novamente no botão para canalizar a leitura de {tipo_leitura}."
 
 # =========================================================================
 # 3. INTERFACE VISUAL DO USUÁRIO (WEB APP)
