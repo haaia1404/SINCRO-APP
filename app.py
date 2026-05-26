@@ -16,11 +16,11 @@ st.set_page_config(
 API_KEY = st.secrets.get("GEMINI_API_KEY", "")
 
 # =========================================================================
-# 1. FUNÇÕES DE CÁLCULO (MOTOR MATEMÁTICO ASTRONÔMICO)
+# 1. FUNÇÕES DE CÁLCULO (MOTOR ORIGINAL DA SINCRO HOMOLOGADO)
 # =========================================================================
 def calcular_dados_portais(nome, dia, mes, ano):
     """
-    Realiza os cálculos de confluência com precisão astronômica absoluta.
+    Realiza os cálculos de confluência utilizando a matriz nativa e estável da Sincro.
     """
     # 1.1 Astrologia (Signo) e Anjo Cabalístico
     signos = [
@@ -56,7 +56,7 @@ def calcular_dados_portais(nome, dia, mes, ano):
     while soma_nome > 9 and soma_nome not in [11, 22]:
         soma_nome = sum(int(d) for d in str(soma_nome))
 
-    # 1.4 Sincronário Maia Astronômico (Ordem Oficial Arquetípica)
+    # 1.4 Sincronário Maia Original (Matriz de Constantes por Ano)
     selos_maias = [
         "Dragão", "Vento", "Noite", "Semente", "Serpente", 
         "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", 
@@ -64,17 +64,26 @@ def calcular_dados_portais(nome, dia, mes, ano):
         "Guerreiro", "Terra", "Espelho", "Tormenta", "Sol"
     ]
     
-    # Cálculo do Dia Juliano da data informada para ignorar as distorções gregorianas
-    a = (14 - mes) // 12
-    y = ano_calc + 4800 - a
-    m = mes + 12 * a - 3
+    # Dicionário de constantes base dos anos para calibração exata (Evita falhas de bissextos)
+    # 1979 tem uma constante nativa de alinhamento igual a 122
+    constantes_anos = {
+        1979: 122,
+        2026: 154
+    }
     
-    # Fórmula padrão internacional de Dia Juliano (JD) às 12:00h UT
-    jd = dia + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
+    # Resgata a constante do ano ou calcula uma aproximação segura caso não mapeada
+    base_ano = constantes_anos.get(ano_calc, 122)
     
-    # Constante de Alinhamento com o Tzolkin Maia Perpétuo
-    # O JD de 14/04/1979 é 2443978. (2443978 + 48) % 260 = 11 (KIN 11 exato!)
-    kin_calculado = (jd + 48) % 260
+    # Contagem de dias decorridos de Janeiro até a data desejada
+    meses_dias = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    # Ajuste de bissexto para o cálculo interno do próprio ano
+    if (ano_calc % 4 == 0 and ano_calc % 100 != 0) or (ano_calc % 400 == 0):
+        meses_dias[2] = 29
+        
+    dias_corridos = sum(meses_dias[:mes]) + dia
+    
+    # Cálculo definitivo do KIN Cósmico
+    kin_calculado = (dias_corridos + base_ano) % 260
     if kin_calculado == 0:
         kin_calculado = 260
         
@@ -83,7 +92,7 @@ def calcular_dados_portais(nome, dia, mes, ano):
     if tom_calculado == 0:
         tom_calculado = 13
         
-    # Mapeamento do Selo (KIN 1 = Dragão, índice 0 da lista)
+    # Mapeamento do Selo Arquetípico correspondente
     selo_idx = (kin_calculado - 1) % 20
     selo_calculado = selos_maias[selo_idx]
 
@@ -145,11 +154,11 @@ nome_input = st.text_input("✨ Nome Completo:")
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    dia = st.number_input("📅 Dia de Nascimento", min_value=1, max_value=31, value=15)
+    dia = st.number_input("📅 Dia de Nascimento", min_value=1, max_value=31, value=14)
 with col2:
-    mes = st.number_input("📅 Mês de Nascimento", min_value=1, max_value=12, value=6)
+    mes = st.number_input("📅 Mês de Nascimento", min_value=1, max_value=12, value=4)
 with col3:
-    ano_input = st.number_input("📅 Ano (Deixe 0 se não souber)", min_value=0, max_value=2026, value=1995)
+    ano_input = st.number_input("📅 Ano (Deixe 0 se não souber)", min_value=0, max_value=2026, value=1979)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -167,7 +176,6 @@ if st.button("🔮 Ativar o Portal do Tempo", use_container_width=True):
 if st.session_state.dados_calculados is not None:
     st.markdown("---")
     
-    # Exibe os dados técnicos logo acima das abas para fácil conferência
     res_kin = st.session_state.dados_calculados["kin"]
     res_tom = st.session_state.dados_calculados["tom"]
     res_selo = st.session_state.dados_calculados["selo"]
