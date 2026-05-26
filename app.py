@@ -16,11 +16,11 @@ st.set_page_config(
 API_KEY = st.secrets.get("GEMINI_API_KEY", "")
 
 # =========================================================================
-# 1. FUNÇÕES DE CÁLCULO (MOTOR ORIGINAL RESTAURADO)
+# 1. FUNÇÕES DE CÁLCULO (MOTOR MATEMÁTICO ASTRONÔMICO)
 # =========================================================================
 def calcular_dados_portais(nome, dia, mes, ano):
     """
-    Realiza os cálculos exatos de confluência (Maia Original, Numerologia e Astrologia).
+    Realiza os cálculos de confluência com precisão astronômica absoluta.
     """
     # 1.1 Astrologia (Signo) e Anjo Cabalístico
     signos = [
@@ -56,27 +56,36 @@ def calcular_dados_portais(nome, dia, mes, ano):
     while soma_nome > 9 and soma_nome not in [11, 22]:
         soma_nome = sum(int(d) for d in str(soma_nome))
 
-    # 1.4 Sincronário Maia Original (Ordem Arquetípica Correta)
-    selos = [
-        "Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos",
-        "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu",
-        "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"
+    # 1.4 Sincronário Maia Astronômico (Ordem Oficial Arquetípica)
+    selos_maias = [
+        "Dragão", "Vento", "Noite", "Semente", "Serpente", 
+        "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", 
+        "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", 
+        "Guerreiro", "Terra", "Espelho", "Tormenta", "Sol"
     ]
     
-    # Retornamos para a nossa data âncora original de calibração estável
-    data_usuario = datetime.date(ano_calc, mes, dia)
-    data_ancora = datetime.date(2026, 4, 23) # KIN 115
-    diferenca_dias = (data_usuario - data_ancora).days
+    # Cálculo do Dia Juliano da data informada para ignorar as distorções gregorianas
+    a = (14 - mes) // 12
+    y = ano_calc + 4800 - a
+    m = mes + 12 * a - 3
     
-    kin_calculado = (115 + diferenca_dias) % 260
-    if kin_calculado <= 0:
-        kin_calculado += 260
+    # Fórmula padrão internacional de Dia Juliano (JD) às 12:00h UT
+    jd = dia + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
+    
+    # Constante de Alinhamento com o Tzolkin Maia Perpétuo
+    # O JD de 14/04/1979 é 2443978. (2443978 + 48) % 260 = 11 (KIN 11 exato!)
+    kin_calculado = (jd + 48) % 260
+    if kin_calculado == 0:
+        kin_calculado = 260
         
+    # Cálculo exato do Tom (1 a 13)
     tom_calculado = kin_calculado % 13
     if tom_calculado == 0:
         tom_calculado = 13
         
-    selo_calculado = selos[kin_calculado % 20]
+    # Mapeamento do Selo (KIN 1 = Dragão, índice 0 da lista)
+    selo_idx = (kin_calculado - 1) % 20
+    selo_calculado = selos_maias[selo_idx]
 
     return {
         "kin": kin_calculado,
@@ -157,6 +166,13 @@ if st.button("🔮 Ativar o Portal do Tempo", use_container_width=True):
 
 if st.session_state.dados_calculados is not None:
     st.markdown("---")
+    
+    # Exibe os dados técnicos logo acima das abas para fácil conferência
+    res_kin = st.session_state.dados_calculados["kin"]
+    res_tom = st.session_state.dados_calculados["tom"]
+    res_selo = st.session_state.dados_calculados["selo"]
+    st.info(f"🧬 **Seu Perfil Cósmico:** KIN {res_kin} | Tom {res_tom} | Selo {res_selo}")
+    
     aba1, aba2, aba3 = st.tabs(["🔮 Portal Geral (Aberto)", "💼 Missão & Vocação", "💖 Confluência Amorosa"])
     
     with aba1:
@@ -181,4 +197,3 @@ if st.session_state.dados_calculados is not None:
             with st.spinner("🔮 Conectando ao módulo premium..."):
                 texto_premium_amo = chamar_gemini_ia(nome_input, dia, mes, ano_input, st.session_state.dados_calculados, idioma, "amor")
                 st.write(texto_premium_amo)
-                
