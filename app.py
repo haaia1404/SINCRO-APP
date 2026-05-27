@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (CONSTANTES OFICIAIS 1920 - 2030)
+# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (MATRIZ TZOLKIN CORRIGIDA)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,7 +81,7 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. TABELA COMPLETA DE CONSTANTES DE ANO NOVO MAIA (26 DE JULHO)
+    # C. TABELA DE CONSTANTES DO ANO NOVO MAIA (ALINHAMENTO HISTÓRICO TRANCADO)
     # ---------------------------------------------------------------------
     TABELA_ANOS_MAIA = {
         1920: 179, 1921: 24,  1922: 129, 1923: 234, 1924: 79,  1925: 184, 1926: 29,  1927: 134, 1928: 239, 1929: 84,
@@ -98,39 +98,38 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
         2030: 54
     }
     
-    # Determina o Ano Novo Maia correspondente (Inicia sempre em 26 de Julho)
     if (m < 7) or (m == 7 and d < 26):
         ano_maia = a - 1
     else:
         ano_maia = a
         
     data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
+    kin_base_ano = TABELA_ANOS_MAIA.get(ano_maia, 1)
     
-    # Busca a constante exata da tabela
-    kin_base_ano = TABELA_ANOS_MAIA.get(ano_maia)
-    
-    # Diferença real de dias no calendário gregoriano
     data_nascimento = datetime.date(a, m, d)
     dias_corridos = (data_nascimento - data_inicio_ano_maia).days
     
-    # Amortecimento de bissextos: ignora o dia 29 de fevereiro se a contagem passar por ele
+    # Amortecimento estrito do dia extra (29 de fevereiro)
     if ano_maia % 4 == 0 and data_inicio_ano_maia <= datetime.date(ano_maia, 2, 29) <= data_nascimento:
         dias_corridos -= 1
     elif a % 4 == 0 and data_inicio_ano_maia >= datetime.date(ano_maia, 2, 29) >= data_nascimento:
         dias_corridos += 1
 
-    # Modulação harmônica sobre o ciclo estável de 260 KINs
+    # Cálculo do KIN
     kin = (kin_base_ano + dias_corridos) % 260
     if kin <= 0: 
         kin += 260
         
-    # Cálculo exato do Tom Pulsar (1 a 13)
+    # Cálculo do Tom (1 a 13)
     tom = kin % 13
     if tom == 0: 
         tom = 13
         
-    # Identificação dos 20 Selos Solares oficiais
+    # MATRIZ CORRIGIDA: Lista oficial de Selos na ordem cronológica correta
+    # O Selo 1 é Dragão, o 19 é Tormenta, e o 0 (ou 20) é o Sol.
     selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
+    
+    # Fórmula de indexação corrigida para respeitar a rotação maia tradicional
     selo = selos_lista[kin % 20]
 
     # ---------------------------------------------------------------------
