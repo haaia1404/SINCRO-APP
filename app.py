@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO NATIVO DO TZOLKIN (ALGORITMO DA LEI DO TEMPO)
+# 2. MOTOR MATEMÁTICO REALCIBRADO (FREQUÊNCIA ARQUETÍPICA 13:20)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -53,15 +53,17 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
     
     # ---------------------------------------------------------------------
-    # B. Anjo Cabalístico (Mapeamento Completo dos 72 Gênios da Cabala)
+    # B. Anjo Cabalístico Corrigido (Eixo Astrológico de Graus começando em 20/03)
     # ---------------------------------------------------------------------
-    day_year = datetime.date(2023, m, d).timetuple().tm_yday
-    if m == 10 and d == 11:
-        anjo_num = 60
-    elif m == 11 and d == 11:
-        anjo_num = 47
-    else:
-        anjo_num = int(((day_year - 1) / 5) % 72) + 1
+    data_anjo = datetime.date(2023, m, d)
+    inicio_astrologico = datetime.date(2023, 3, 20)
+    dias_do_grau = (data_anjo - inicio_astrologico).days
+    if dias_do_grau < 0:
+        dias_do_grau += 365
+        
+    anjo_num = int(dias_do_grau / 5) + 1
+    if anjo_num > 72: 
+        anjo_num = 72
 
     anjos_nomes_completos = {
         1: "Vehuiah", 2: "Jeliel", 3: "Sitael", 4: "Elemiah", 5: "Mahasiah", 6: "Lelahel", 
@@ -81,50 +83,40 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. ALGORITMO OFICIAL DA LEI DO TEMPO (MATRIZ DE CONSTANTES DE CONSTELAÇÃO ANUAL)
+    # C. CÁLCULO CÍCLICO ABSOLUTO DO KIN (BÚSSOLA DE CONTINGÊNCIA HISTÓRICA)
     # ---------------------------------------------------------------------
-    # Determinar a qual ano do Sincronário de 13 Luas a data pertence (Ano Novo em 26 de Julho)
-    if (m < 7) or (m == 7 and d < 26):
-        ano_maia_sincronico = a - 1
-    else:
-        ano_maia_sincronico = a
-
-    # Fórmula matemática da semente de ano maia (Ciclo de 52 anos de Argüelles)
-    # Define o KIN exato que abriu as portas no dia 26 de Julho daquele ano específico
-    constante_ciclo = (ano_maia_sincronico - 1900) % 52
-    tabela_portadores = [
-        114, 219, 64, 169, 14, 119, 224, 69, 174, 19, 124, 229, 74, 179, 24, 129, 234, 79, 184, 29, 
-        134, 239, 84, 189, 34, 139, 244, 89, 194, 39, 144, 249, 94, 199, 44, 149, 254, 99, 204, 49, 
-        154, 259, 104, 209, 54, 159, 4, 109, 214, 59, 164, 9
-    ]
-    kin_semente_ano = tabela_portadores[constante_ciclo]
-
-    # Calcular os dias decorridos a partir de 26 de Julho gregoriano
-    data_ano_novo = datetime.date(ano_maia_sincronico, 7, 26)
-    data_aniversario = datetime.date(a, m, d)
+    # Ancoragem matemática baseada na data alvo validada: 14/04/1979 = KIN 131
+    data_ancora_mestra = datetime.date(1979, 4, 14)
+    kin_ancora_mestro = 131
     
-    # Tratamento do Protocolo Bissexto (0.0 Hunab Ku) -> Dia nulo
+    data_nascimento = datetime.date(a, m, d)
     if m == 2 and d == 29:
-        data_aniversario = datetime.date(a, 2, 28)
-
-    dias_passados = (data_aniversario - data_ano_novo).days
-
-    # Se o intervalo cruzar um dia 29 de fevereiro, nós removemos esse dia da contagem (Dia Nulo)
-    if ano_maia_sincronico % 4 == 0 and data_ano_novo <= datetime.date(ano_maia_sincronico, 2, 29) <= data_aniversario:
-        dias_passados -= 1
-    elif a % 4 == 0 and data_ano_novo >= datetime.date(ano_maia_sincronico, 2, 29) >= data_aniversario:
-        dias_passados += 1
-
-    # Cálculo modular definitivo do KIN sobre a engrenagem cíclica de 260 assinaturas
-    kin = (kin_semente_ano + dias_passados) % 260
+        data_nascimento = datetime.date(a, 2, 28)
+        
+    dias_totais = (data_nascimento - data_ancora_mestra).days
+    
+    # Contagem exata de bissextos intercalares no fluxo linear gregoriano
+    bissextos = 0
+    ano_menor = min(1979, a)
+    ano_maior = max(1979, a)
+    for ano_c in range(ano_menor, ano_maior + 1):
+        if ano_c % 4 == 0:
+            data_b = datetime.date(ano_c, 2, 29)
+            if min(data_ancora_mestra, data_nascimento) <= data_b <= max(data_ancora_mestra, data_nascimento):
+                bissextos += 1
+                
+    if dias_totais >= 0:
+        dias_sincronizados = dias_totais - bissextos
+    else:
+        dias_sincronizados = dias_totais + bissextos
+        
+    kin = (kin_ancora_mestro + dias_sincronizados) % 260
     if kin <= 0:
         kin += 260
-
-    # Extração das Engrenagens do Kin baseadas no Manifesto Enviado
-    # Tom Galáctico (1 a 13)
-    tom = ((kin - 1) % 13) + 1
         
-    # Selo Solar (1 a 20) alinhado rigorosamente do Dragão (1) ao Sol (20)
+    # Extração das Engrenagens do Manifesto Oficial Tzolkin
+    tom = ((kin - 1) % 13) + 1
+    
     selos_lista = [
         "Dragão Vermelho", "Vento Branco", "Noite Azul", "Semente Amarela", 
         "Serpente Vermelha", "Enlaçador de Mundos Branco", "Mão Azul", "Estrela Amarela", 
@@ -226,3 +218,4 @@ if st.button("Alinhar Portal Cósmico"):
                         
                 except Exception as e:
                     st.error(f"❌ Falha crítica de conexão: {e}")
+                    
