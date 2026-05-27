@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (MATRIZ TZOLKIN CORRIGIDA)
+# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (VARREDURA HISTÓRICA DE BISSEXTOS)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,55 +81,46 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. TABELA DE CONSTANTES DO ANO NOVO MAIA (ALINHAMENTO HISTÓRICO TRANCADO)
+    # C. ALGORITMO DE VARREDURA DE BISSEXTOS (PONTO ÂNCORA: 01/01/1950 = KIN 118)
     # ---------------------------------------------------------------------
-    TABELA_ANOS_MAIA = {
-        1920: 179, 1921: 24,  1922: 129, 1923: 234, 1924: 79,  1925: 184, 1926: 29,  1927: 134, 1928: 239, 1929: 84,
-        1930: 189, 1931: 34,  1932: 139, 1933: 244, 1934: 94,  1935: 199, 1936: 44,  1937: 149, 1938: 254, 1939: 99,
-        1940: 204, 1941: 49,  1942: 154, 1943: 259, 1944: 104, 1945: 209, 1946: 54,  1947: 159, 1948: 4,   1949: 109,
-        1950: 214, 1951: 59,  1952: 164, 1953: 9,   1954: 114, 1955: 219, 1956: 64,  1957: 169, 1958: 14,  1959: 119,
-        1960: 224, 1961: 69,  1962: 174, 1963: 19,  1964: 124, 1965: 229, 1966: 74,  1967: 179, 1968: 24,  1969: 129,
-        1970: 234, 1971: 79,  1972: 184, 1973: 29,  1974: 134, 1975: 239, 1976: 84,  1977: 189, 1978: 34,  1979: 139,
-        1980: 244, 1981: 94,  1982: 199, 1983: 44,  1984: 149, 1985: 254, 1986: 104, 1987: 209, 1988: 54,  1989: 159,
-        1990: 4,   1991: 109, 1992: 214, 1993: 59,  1994: 164, 1995: 9,   1996: 114, 1997: 219, 1998: 64,  1999: 169,
-        2000: 14,  2001: 119, 2002: 224, 2003: 69,  2004: 174, 2005: 19,  2006: 124, 2007: 229, 2008: 74,  2009: 179,
-        2010: 24,  2011: 129, 2012: 234, 2013: 79,  2014: 184, 2015: 29,  2016: 134, 2017: 239, 2018: 84,  2019: 189,
-        2020: 34,  2021: 139, 2022: 244, 2023: 94,  2024: 199, 2025: 44,  2026: 149, 2027: 254, 2028: 104, 2029: 209,
-        2030: 54
-    }
-    
-    if (m < 7) or (m == 7 and d < 26):
-        ano_maia = a - 1
-    else:
-        ano_maia = a
-        
-    data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
-    kin_base_ano = TABELA_ANOS_MAIA.get(ano_maia, 1)
-    
+    data_ancora = datetime.date(1950, 1, 1)
+    kin_ancora = 118
     data_nascimento = datetime.date(a, m, d)
-    dias_corridos = (data_nascimento - data_inicio_ano_maia).days
     
-    # Amortecimento estrito do dia extra (29 de fevereiro)
-    if ano_maia % 4 == 0 and data_inicio_ano_maia <= datetime.date(ano_maia, 2, 29) <= data_nascimento:
-        dias_corridos -= 1
-    elif a % 4 == 0 and data_inicio_ano_maia >= datetime.date(ano_maia, 2, 29) >= data_nascimento:
-        dias_corridos += 1
+    # Diferença total de dias corridos lineares
+    total_dias = (data_nascimento - data_ancora).days
+    
+    # Descobrir quantos dias 29 de fevereiro existiram nesse intervalo de anos
+    bissextos_no_caminho = 0
+    ano_inicio = min(1950, a)
+    ano_fim = max(1950, a)
+    
+    for ano_corrente in range(ano_inicio, ano_fim + 1):
+        if ano_corrente % 4 == 0:
+            dia_bissexto = datetime.date(ano_corrente, 2, 29)
+            # Verifica se o dia bissexto real ficou entre as duas datas
+            if min(data_ancora, data_nascimento) <= dia_bissexto <= max(data_ancora, data_nascimento):
+                bissextos_no_caminho += 1
+                
+    # Subtrai os dias bissextos (já que o calendário maia os ignora na contagem dos KINs)
+    if total_dias >= 0:
+        dias_maia = total_dias - bissextos_no_caminho
+    else:
+        dias_maia = total_dias + bissextos_no_caminho
 
-    # Cálculo do KIN
-    kin = (kin_base_ano + dias_corridos) % 260
-    if kin <= 0: 
+    # Modulação cíclica do KIN na matriz de 260 dias
+    kin = (kin_ancora + dias_maia) % 260
+    if kin <= 0:
         kin += 260
         
-    # Cálculo do Tom (1 a 13)
+    # Cálculo do Tom Cósmico (1 a 13)
     tom = kin % 13
-    if tom == 0: 
+    if tom == 0:
         tom = 13
         
-    # MATRIZ CORRIGIDA: Lista oficial de Selos na ordem cronológica correta
-    # O Selo 1 é Dragão, o 19 é Tormenta, e o 0 (ou 20) é o Sol.
+    # Lista Oficial de Selos Alinhados Cronologicamente
+    # Indexado de forma que o resto da divisão posicione o selo perfeitamente
     selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
-    
-    # Fórmula de indexação corrigida para respeitar a rotação maia tradicional
     selo = selos_lista[kin % 20]
 
     # ---------------------------------------------------------------------
