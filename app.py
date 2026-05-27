@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (Sincronia Estrita 1º de Janeiro)
+# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (CONSTANTES OFICIAIS 1920 - 2030)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,30 +81,46 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. TABELA DE CORREÇÃO ESTRETA — KIN DE ANCORAGEM EM 1º DE JANEIRO
+    # C. TABELA COMPLETA DE CONSTANTES DE ANO NOVO MAIA (26 DE JULHO)
     # ---------------------------------------------------------------------
-    KIN_PRIMEIRO_JANEIRO = {
-        1955: 113, # 01/01/1955 iniciava no KIN 113
-        1975: 228, # 01/01/1975 iniciava no KIN 228
-        2026: 121  # 01/01/2026 iniciava no KIN 121
+    TABELA_ANOS_MAIA = {
+        1920: 179, 1921: 24,  1922: 129, 1923: 234, 1924: 79,  1925: 184, 1926: 29,  1927: 134, 1928: 239, 1929: 84,
+        1930: 189, 1931: 34,  1932: 139, 1933: 244, 1934: 94,  1935: 199, 1936: 44,  1937: 149, 1938: 254, 1939: 99,
+        1940: 204, 1941: 49,  1942: 154, 1943: 259, 1944: 104, 1945: 209, 1946: 54,  1947: 159, 1948: 4,   1949: 109,
+        1950: 214, 1951: 59,  1952: 164, 1953: 9,   1954: 114, 1955: 219, 1956: 64,  1957: 169, 1958: 14,  1959: 119,
+        1960: 224, 1961: 69,  1962: 174, 1963: 19,  1964: 124, 1965: 229, 1966: 74,  1967: 179, 1968: 24,  1969: 129,
+        1970: 234, 1971: 79,  1972: 184, 1973: 29,  1974: 134, 1975: 239, 1976: 84,  1977: 189, 1978: 34,  1979: 139,
+        1980: 244, 1981: 94,  1982: 199, 1983: 44,  1984: 149, 1985: 254, 1986: 104, 1987: 209, 1988: 54,  1989: 159,
+        1990: 4,   1991: 109, 1992: 214, 1993: 59,  1994: 164, 1995: 9,   1996: 114, 1997: 219, 1998: 64,  1999: 169,
+        2000: 14,  2001: 119, 2002: 224, 2003: 69,  2004: 174, 2005: 19,  2006: 124, 2007: 229, 2008: 74,  2009: 179,
+        2010: 24,  2011: 129, 2012: 234, 2013: 79,  2014: 184, 2015: 29,  2016: 134, 2017: 239, 2018: 84,  2019: 189,
+        2020: 34,  2021: 139, 2022: 244, 2023: 94,  2024: 199, 2025: 44,  2026: 149, 2027: 254, 2028: 104, 2029: 209,
+        2030: 54
     }
     
-    # Se o ano do teste não estiver mapeado na tabela estrita de 1º de Jan,
-    # usamos o cálculo matemático referencial estável padrão do Tzolkin
-    kin_base_janeiro = KIN_PRIMEIRO_JANEIRO.get(a, int(((a - 1900) * 105.25 + 130) % 260))
+    # Determina o Ano Novo Maia correspondente (Inicia sempre em 26 de Julho)
+    if (m < 7) or (m == 7 and d < 26):
+        ano_maia = a - 1
+    else:
+        ano_maia = a
+        
+    data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
     
-    # Calcula quantos dias se passaram desde 1º de Janeiro daquele ano
-    data_inicio_ano = datetime.date(a, 1, 1)
+    # Busca a constante exata da tabela
+    kin_base_ano = TABELA_ANOS_MAIA.get(ano_maia)
+    
+    # Diferença real de dias no calendário gregoriano
     data_nascimento = datetime.date(a, m, d)
-    dias_corridos = (data_nascimento - data_inicio_ano).days
+    dias_corridos = (data_nascimento - data_inicio_ano_maia).days
     
-    # Se for ano bissexto e a data passou de 29 de fevereiro, removemos 1 dia de distorção
-    if a % 4 == 0 and m > 2:
-        if not (m == 2 and d == 29):
-            dias_corridos -= 1
+    # Amortecimento de bissextos: ignora o dia 29 de fevereiro se a contagem passar por ele
+    if ano_maia % 4 == 0 and data_inicio_ano_maia <= datetime.date(ano_maia, 2, 29) <= data_nascimento:
+        dias_corridos -= 1
+    elif a % 4 == 0 and data_inicio_ano_maia >= datetime.date(ano_maia, 2, 29) >= data_nascimento:
+        dias_corridos += 1
 
-    # Modulação harmônica sobre a base estável de 260 KINs
-    kin = (kin_base_janeiro + dias_corridos) % 260
+    # Modulação harmônica sobre o ciclo estável de 260 KINs
+    kin = (kin_base_ano + dias_corridos) % 260
     if kin <= 0: 
         kin += 260
         
@@ -113,8 +129,7 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     if tom == 0: 
         tom = 13
         
-    # Identificação dos 20 Selos Solares oficiais (Alinhamento pelo resto da divisão por 20)
-    # Lista rotacionada adequadamente para coincidir com a numeração do KIN
+    # Identificação dos 20 Selos Solares oficiais
     selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
     selo = selos_lista[kin % 20]
 
