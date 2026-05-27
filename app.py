@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E DINÂMICO (ALGORITMO DE PROGRESSÃO HISTÓRICA)
+# 2. MOTOR MATEMÁTICO DE REGRESSÃO DE MATRIZ DE TEMPO (13:20)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,19 +81,19 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. ALGORITMO DINÂMICO DO TZOLKIN (ÂNCORA: 26/07/2023 = KIN 94)
+    # C. ALGORITMO CRONOLÓGICO SEGURO (ÂNCORA MESTRA: 26/07/2023 = KIN 94)
     # ---------------------------------------------------------------------
     data_ancora = datetime.date(2023, 7, 26)
     kin_ancora = 94
     data_nascimento = datetime.date(a, m, d)
     
-    # Tratamento estrito do protocolo Bissexto (0.0 Hunab Ku)
+    # Protocolo Bissexto (0.0 Hunab Ku) -> Amortece para a energia da véspera
     if m == 2 and d == 29:
         data_nascimento = datetime.date(a, 2, 28)
         
     total_dias = (data_nascimento - data_ancora).days
     
-    # Contagem dinâmica e remoção de todos os dias 29 de fevereiro do intervalo
+    # Contagem analítica dos dias intercalares (29 de fevereiro) entre os eixos de tempo
     bissextos_no_caminho = 0
     ano_inicio = min(2023, a)
     ano_fim = max(2023, a)
@@ -104,20 +104,21 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
             if min(data_ancora, data_nascimento) <= dia_bissexto <= max(data_ancora, data_nascimento):
                 bissextos_no_caminho += 1
                 
+    # Correção do vetor de tempo: se retrocedemos ao passado, removemos os bissextos da distância fluida
     if total_dias >= 0:
         dias_maia = total_dias - bissextos_no_caminho
     else:
         dias_maia = total_dias + bissextos_no_caminho
 
-    # Modulação do KIN na matriz cíclica de 260 dias
+    # Modulação cíclica absoluta no anel de 260 assinaturas galácticas
     kin = (kin_ancora + dias_maia) % 260
     if kin <= 0:
         kin += 260
         
-    # Cálculo do Tom Harmônico (1 a 13)
+    # Extração matemática estrutural do Tom Galáctico (1 a 13)
     tom = ((kin - 1) % 13) + 1
         
-    # Lista de Selos perfeitamente alinhada e cíclica
+    # Alinhamento da Roda dos Selos (Do Dragão [1] ao Sol [20])
     selos_lista = [
         "Dragão Vermelho", "Vento Branco", "Noite Azul", "Semente Amarela", 
         "Serpente Vermelha", "Enlaçador de Mundos Branco", "Mão Azul", "Estrela Amarela", 
@@ -219,4 +220,3 @@ if st.button("Alinhar Portal Cósmico"):
                         
                 except Exception as e:
                     st.error(f"❌ Falha crítica de conexão: {e}")
-                    
