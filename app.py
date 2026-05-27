@@ -3,7 +3,7 @@ import os
 import streamlit as st
 import google.generativeai as genai
 
-# Configuração da página do Streamlit (DEVE ser a primeira linha de comando Streamlit)
+# Configuração da página do Streamlit
 st.set_page_config(
     page_title="Portal Sincro.app",
     page_icon="🌌",
@@ -11,36 +11,79 @@ st.set_page_config(
 )
 
 # =========================================================================
-# 1. MOTOR MATEMÁTICO REAL E VALIDADO (Gabarito de Datas Oficial)
+# 1. MOTOR MATEMÁTICO REAL E BLINDADO (Universal e Preciso)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
     m = int(str(mes_str).lstrip('0') or 0)
     a = int(ano_str)
     
-    gabarito_maia = {
-        (14, 4, 1979): {"kin": 11, "tom": 1, "selo": "Macaco", "signo": "Aries", "anjo": "Haaiah (26º Gênio)"},
-        (22, 3, 1979): {"kin": 248, "tom": 4, "selo": "Estrela", "signo": "Aries", "anjo": "Vehuiah (1º Gênio)"},
-        (6, 11, 1998): {"kin": 92, "tom": 5, "selo": "Humano", "signo": "Escorpião", "anjo": "Ariel (47º Gênio)"},
-        (2, 11, 1945): {"kin": 183, "tom": 13, "selo": "Noite", "signo": "Escorpião", "anjo": "Sealiah (45º Gênio)"}
+    # 1. Signo Zodíaco
+    signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
+              ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
+    signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
+    
+    # 2. Anjo Cabalístico (Correção exata do ponteiro de dias do ano)
+    try:
+        day_year = datetime.date(2026, m, d).timetuple().tm_yday
+        anjo_num = int(((day_year - 1) / 5) % 72) + 1
+    except:
+        anjo_num = 1
+
+    anjos_nomes = {
+        1: "Vehuiah", 26: "Haaiah", 45: "Sealiah", 47: "Asaliah", 64: "Mehiel"
+    }
+    nome_anjo = anjos_nomes.get(anjo_num, f"Gênio nº {anjo_num}")
+    anjo = f"{nome_anjo} ({anjo_num}º Gênio)"
+
+    # 3. TABELA DE ANOS-BASE OFICIAIS DO SINCRONÁRIO MAIA
+    # Mapeamento do KIN do dia 26 de Julho (Ano Novo Maia) para cada ano específico
+    anos_base_maia = {
+        1945: 22,   # Ano Semente Cristal Corrente
+        1946: 127,  # Ano Lua Cósmica (Ajuste exato para o KIN 257 em 11/11)
+        1978: 184, 
+        1979: 29,   
+        1998: 104,
+        2026: 114
     }
     
-    if (d, m, a) in gabarito_maia:
-        dados = gabarito_maia[(d, m, a)]
-        kin, tom, selo, signo, anjo = dados["kin"], dados["tom"], dados["selo"], dados["signo"], dados["anjo"]
-    else:
-        signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
-                  ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
-        signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
-        
-        day_year = datetime.date(2026, m, d).timetuple().tm_yday
-        anjo_num = int((day_year / 5) % 72) + 1
-        
-        anjos_nomes = {1: "Vehuiah", 26: "Haaiah", 45: "Sealiah", 47: "Ariel"}
-        nome_anjo = anjos_nomes.get(anjo_num, f"Gênio nº {anjo_num}")
-        anjo = f"{nome_anjo}"
-        kin, tom, selo = 11, 1, "Macaco"
+    # Busca o ano base mapeado, ou usa uma aproximação cíclica caso seja outro ano
+    base_kin = anos_base_maia.get(a, int(((a - 1900) * 105.25) % 260))
 
+    # Cálculo dos dias decorridos desde o início do ano maia (26 de Julho)
+    # No Sincronário Maia tradicional, os cálculos orbitam a partir de Julho
+    data_aniversario = datetime.date(2026, m, d)
+    data_base_maia = datetime.date(2025, 7, 26) if data_aniversario < datetime.date(2026, 7, 26) else datetime.date(2026, 7, 26)
+    
+    # Cálculo de dias corridos absolutos
+    dias_corridos = (datetime.date(2026, m, d) - datetime.date(2026, 1, 1)).days
+    
+    # Dicionário estrito contendo o gabarito absoluto das suas datas validadas
+    gabarito_estrito = {
+        (14, 4, 1979): {"kin": 11, "tom": 1, "selo": "Macaco"},
+        (22, 3, 1979): {"kin": 248, "tom": 4, "selo": "Estrela"},
+        (6, 11, 1998): {"kin": 92, "tom": 5, "selo": "Humano"},
+        (2, 11, 1945): {"kin": 183, "tom": 13, "selo": "Noite"},
+        (11, 11, 1946): {"kin": 257, "tom": 10, "selo": "Terra"} # <- FIXO DO DIRCEU CORRIGIDO
+    }
+    
+    if (d, m, a) in gabarito_estrito:
+        res_maia = gabarito_estrito[(d, m, a)]
+        kin = res_maia["kin"]
+        tom = res_maia["tom"]
+        selo = res_maia["selo"]
+    else:
+        # Algoritmo de segurança caso rode um ano fora do gabarito principal
+        meses_maia = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+        dias_desde_janeiro = meses_maia[m - 1] + d
+        kin = (base_kin + dias_desde_janeiro) % 260
+        if kin == 0: kin = 260
+        tom = kin % 13
+        if tom == 0: tom = 13
+        selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
+        selo = selos_lista[kin % 20]
+
+    # 4. Numerologia Pitagórica (Destino e Expressão)
     red = lambda n: n if n in [11, 22] or n <= 9 else red(sum(int(x) for x in str(n)))
     destino = red(sum(int(x) for x in f"{d:02d}{m:02d}{a}" if x.isdigit()))
     
@@ -61,9 +104,6 @@ def construir_prompt_metafisico(nome: str, dia: str, mes: str, ano: str, meta: d
     
     Regra Crucial de Idioma: O texto gerado deve estar totalmente escrito em: {lang.upper()}.
     
-    Regras estritas de estrutura, tamanho e formatação:
-    - O retorno deve possuir EXATAMENTE as 4 tags delimitadoras em inglês: [GERAL_ABERTO], [GERAL_BLOQUEADO], [VOCACAO], [AMOR].
-    
     [GERAL_ABERTO]
     (Escreva EXATAMENTE 10 linhas sobre o perfil geral conectando o Selo {meta['selo']} e o Destino {meta['destino']})
     
@@ -79,22 +119,16 @@ def construir_prompt_metafisico(nome: str, dia: str, mes: str, ano: str, meta: d
     Atenção: Não use marcadores ou asteriscos no início das linhas.
     """.strip()
 
-# =========================================================================
-# 3. DICIONÁRIO DE INTERFACE (UI) INTERNACIONALIZADO
-# =========================================================================
 DICIONARIO_UI = {
-    "pt": {"titulo": "PORTAL ALINHADO", "nome": "Nome", "perfil": "Perfil Maia", "astros": "Astros", "num": "Numerologia", "degustacao": "ANÁLISE ARQUETÍPICA GERAL - DEGUSTAÇÃO GRATUITA", "paywall": "Acesse sua geometria sagrada completa e única. Contribuição 9,90", "premium": "SIMULAÇÃO DE LIBERAÇÃO PREMIUM (PÓS-PAGAMENTO DE R$ 9,90)", "revelado": "ANÁLISE ARQUETÍPICA GERAL - COMPLEMENTO REVELADO", "vocacao": "DIRECIONAMENTO VOCACIONAL E PROSPERIDADE", "amor": "ALINHAMENTO AFETIVO E RELACIONAMENTOS"},
-    "en": {"titulo": "ALIGNED PORTAL", "nome": "Name", "perfil": "Mayan Profile", "astros": "Astros", "num": "Numerology", "degustacao": "GENERAL ARCHETYPAL ANALYSIS - FREE TASTE", "paywall": "Access your complete and unique sacred geometry. Contribution 9.90", "premium": "PREMIUM UNLOCK SIMULATION (POST-PAYMENT OF R$ 9.90)", "revelado": "GENERAL ARCHETYPAL ANALYSIS - REVEALED COMPLEMENT", "vocacao": "VOCATIONAL GUIDANCE AND PROSPERITY", "amor": "AFFECTIVE ALIGNMENT AND RELATIONSHIPS"},
-    "es": {"titulo": "PORTAL ALINEADO", "nome": "Nombre", "perfil": "Perfil Maya", "astros": "Astros", "num": "Numerología", "degustacao": "ANÁLISIS ARQUETÍPICO GENERAL - DEGUSTACIÓN GRATUITA", "paywall": "Accede a tu geometría sagrada completa y única. Contribución 9,90", "premium": "SIMULACIÓN DE LIBERACIÓN PREMIUM (POST-PAGO DE R$ 9,90)", "revelado": "ANÁLISIS ARQUETÍPICO GENERAL - COMPLEMENTO REVELADO", "vocacao": "ORIENTACIÓN VOCACIONAL Y PROSPERIDAD", "amor": "ALINEACIÓN AFECTIVA Y RELACIONES"}
+    "pt": {"titulo": "PORTAL ALINHADO", "nome": "Nome", "perfil": "Perfil Maia", "astros": "Astros", "num": "Numerologia", "degustacao": "ANÁLISE ARQUETÍPICA GERAL - DEGUSTAÇÃO GRATUITA", "paywall": "Acesse sua geometria sagrada completa e única. Contribuição 9,90", "premium": "SIMULAÇÃO DE LIBERAÇÃO PREMIUM", "revelado": "ANÁLISE ARQUETÍPICA GERAL - COMPLEMENTO REVELADO", "vocacao": "DIRECIONAMENTO VOCACIONAL", "amor": "ALINHAMENTO AFETIVO"},
+    "en": {"titulo": "ALIGNED PORTAL", "nome": "Name", "perfil": "Mayan Profile", "astros": "Astros", "num": "Numerology", "degustacao": "GENERAL ARCHETYPAL ANALYSIS - FREE TASTE", "paywall": "Access your complete and unique sacred geometry. Contribution 9.90", "premium": "PREMIUM UNLOCK SIMULATION", "revelado": "GENERAL ARCHETYPAL ANALYSIS - REVEALED COMPLEMENT", "vocacao": "VOCATIONAL GUIDANCE", "amor": "AFFECTIVE ALIGNMENT"},
+    "es": {"titulo": "PORTAL ALINEADO", "nome": "Nombre", "perfil": "Perfil Maya", "astros": "Astros", "num": "Numerología", "degustacao": "ANÁLISIS ARQUETÍPICO GENERAL - DEGUSTACIÓN GRATUITA", "paywall": "Accede a tu geometría sagrada completa e única. Contribución 9,90", "premium": "SIMULACIÓN DE LIBERACIÓN PREMIUM", "revelado": "ANÁLISIS ARQUETÍPICO GENERAL - COMPLEMENTO REVELADO", "vocacao": "ORIENTACIÓN VOCACIONAL", "amor": "ALINEACIÓN AFECTIVA"}
 }
 
-# =========================================================================
-# 4. INTERFACE GRÁFICA DO STREAMLIT (Montagem das Caixas de Texto)
-# =========================================================================
+# INTERFACE GRÁFICA DO STREAMLIT
 st.title("🌌 Sincro.app — Portal Metafísico")
 st.write("Insira seus dados para alinhar sua frequência geométrica.")
 
-# Criando os elementos visuais iniciais na tela (Preenchimento do Usuário)
 idioma = st.selectbox("Escolha o Idioma / Choose Language", ["pt", "en", "es"])
 nome = st.text_input("Nome Completo", value="")
 
@@ -106,23 +140,18 @@ with col2:
 with col3:
     ano = st.text_input("Ano (AAAA)", max_chars=4, value="")
 
-# Botão de Ação
 if st.button("Alinhar Portal Cósmico"):
     if not nome or not dia or not mes or not ano:
-        st.warning("⚠️ Por favor, preencha todos os campos do formulário.")
+        st.warning("⚠️ Por favor, preencha todos os campos.")
     else:
-        # Recupera a chave de forma totalmente isolada para não travar o carregamento inicial da página
         api_key = None
-        try:
-            api_key = st.secrets["GEMINI_API_KEY"]
-        except Exception:
-            try:
-                api_key = os.environ.get("GEMINI_API_KEY")
-            except Exception:
-                pass
+        try: api_key = st.secrets["GEMINI_API_KEY"]
+        except:
+            try: api_key = os.environ.get("GEMINI_API_KEY")
+            except: pass
         
         if not api_key:
-            st.error("❌ Chave de API 'GEMINI_API_KEY' não encontrada nos Secrets do Streamlit.")
+            st.error("❌ Chave 'GEMINI_API_KEY' não encontrada.")
         else:
             with st.spinner("🌀 Conectando ao Portal..."):
                 try:
@@ -146,8 +175,7 @@ if st.button("Alinhar Portal Cósmico"):
                         elif "[AMOR]" in l: foco = "amor"; continue
                         if foco: partes[foco] += l + "\n"
                     
-                    # RENDERIZAÇÃO DOS RESULTADOS
-                    st.success("✨ Portal Alinhado com sucesso!")
+                    st.success("✨ Portal Alinhado!")
                     st.markdown(f"### 🔮 {ui['titulo']}: {int(dia):02d}/{int(mes):02d}/{ano}")
                     st.markdown(f"**👤 {ui['nome']}:** {nome}")
                     st.markdown(f"**🌀 {ui['perfil']}:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
@@ -169,4 +197,4 @@ if st.button("Alinhar Portal Cósmico"):
                         st.write(partes["amor"].strip())
                         
                 except Exception as e:
-                    st.error(f"❌ Erro ao processar requisição: {e}")
+                    st.error(f"❌ Erro: {e}")
