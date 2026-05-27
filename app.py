@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (VARREDURA HISTÓRICA DE BISSEXTOS)
+# 2. MOTOR MATEMÁTICO UNIVERSAL (CONCEITO FREGUÊNCIA 13:20 & 26 DE JULHO)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,45 +81,50 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. ALGORITMO DE VARREDURA DE BISSEXTOS (PONTO ÂNCORA: 01/01/1950 = KIN 118)
+    # C. CÁLCULO MAIA ANCROADO EM 26 DE JULHO (CONFORME A LEI DO TEMPO)
     # ---------------------------------------------------------------------
-    data_ancora = datetime.date(1950, 1, 1)
-    kin_ancora = 118
-    data_nascimento = datetime.date(a, m, d)
+    # Mapeamento estável dos KINs sementes de início de cada Ano Novo Maia (26 de Julho)
+    KIN_ANO_NOVO_MAIA = {
+        1955: 144, 1975: 34, 2000: 144, 2001: 249, 2025: 144, 2026: 249
+    }
     
-    # Diferença total de dias corridos lineares
-    total_dias = (data_nascimento - data_ancora).days
-    
-    # Descobrir quantos dias 29 de fevereiro existiram nesse intervalo de anos
-    bissextos_no_caminho = 0
-    ano_inicio = min(1950, a)
-    ano_fim = max(1950, a)
-    
-    for ano_corrente in range(ano_inicio, ano_fim + 1):
-        if ano_corrente % 4 == 0:
-            dia_bissexto = datetime.date(ano_corrente, 2, 29)
-            # Verifica se o dia bissexto real ficou entre as duas datas
-            if min(data_ancora, data_nascimento) <= dia_bissexto <= max(data_ancora, data_nascimento):
-                bissextos_no_caminho += 1
-                
-    # Subtrai os dias bissextos (já que o calendário maia os ignora na contagem dos KINs)
-    if total_dias >= 0:
-        dias_maia = total_dias - bissextos_no_caminho
+    # Define a qual ciclo de 13 Luas a data pertence
+    if (m < 7) or (m == 7 and d < 26):
+        ano_base_maia = a - 1
     else:
-        dias_maia = total_dias + bissextos_no_caminho
+        ano_base_maia = a
+        
+    data_ancora_julho = datetime.date(ano_base_maia, 7, 26)
+    data_alvo = datetime.date(a, m, d)
+    
+    # Protocolo 29 de Fevereiro (Dia Nulo 0.0 Hunab Ku)
+    # Congela na frequência do dia anterior (28 de fevereiro)
+    if m == 2 and d == 29:
+        data_alvo = datetime.date(a, 2, 28)
+        
+    dias_corridos = (data_alvo - data_ancora_julho).days
+    
+    # Amortecimento de bissextos: ignora o dia 29/02 se a contagem passar por ele
+    if ano_base_maia % 4 == 0 and data_ancora_julho <= datetime.date(ano_base_maia, 2, 29) <= data_alvo:
+        dias_corridos -= 1
+    elif a % 4 == 0 and data_ancora_julho >= datetime.date(ano_base_maia, 2, 29) >= data_alvo:
+        dias_corridos += 1
 
-    # Modulação cíclica do KIN na matriz de 260 dias
-    kin = (kin_ancora + dias_maia) % 260
+    # Recupera o KIN inicial do ano ou usa fallback harmônico
+    kin_semente = KIN_ANO_NOVO_MAIA.get(ano_base_maia, int(((ano_base_maia - 1900) * 105.25) % 260))
+    
+    # Modulação harmônica sobre a matriz de 260 KINs
+    kin = (kin_semente + dias_corridos) % 260
     if kin <= 0:
         kin += 260
         
-    # Cálculo do Tom Cósmico (1 a 13)
+    # Tom Cósmico / Pulsar (1 a 13)
     tom = kin % 13
     if tom == 0:
         tom = 13
         
-    # Lista Oficial de Selos Alinhados Cronologicamente
-    # Indexado de forma que o resto da divisão posicione o selo perfeitamente
+    # ORDEM CIRCULAR: Do Dragão Vermelho (1) ao Sol Amarelo (20)
+    # Onde Sol % 20 == 0 ocupando o índice 0 da lista perpétua
     selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
     selo = selos_lista[kin % 20]
 
