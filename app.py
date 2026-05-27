@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO DE REGRESSÃO DE MATRIZ DE TEMPO (13:20)
+# 2. MOTOR MATEMÁTICO NATIVO DO TZOLKIN (ALGORITMO DA LEI DO TEMPO)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,44 +81,50 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. ALGORITMO CRONOLÓGICO SEGURO (ÂNCORA MESTRA: 26/07/2023 = KIN 94)
+    # C. ALGORITMO OFICIAL DA LEI DO TEMPO (MATRIZ DE CONSTANTES DE CONSTELAÇÃO ANUAL)
     # ---------------------------------------------------------------------
-    data_ancora = datetime.date(2023, 7, 26)
-    kin_ancora = 94
-    data_nascimento = datetime.date(a, m, d)
-    
-    # Protocolo Bissexto (0.0 Hunab Ku) -> Amortece para a energia da véspera
-    if m == 2 and d == 29:
-        data_nascimento = datetime.date(a, 2, 28)
-        
-    total_dias = (data_nascimento - data_ancora).days
-    
-    # Contagem analítica dos dias intercalares (29 de fevereiro) entre os eixos de tempo
-    bissextos_no_caminho = 0
-    ano_inicio = min(2023, a)
-    ano_fim = max(2023, a)
-    
-    for ano_corrente in range(ano_inicio, ano_fim + 1):
-        if ano_corrente % 4 == 0:
-            dia_bissexto = datetime.date(ano_corrente, 2, 29)
-            if min(data_ancora, data_nascimento) <= dia_bissexto <= max(data_ancora, data_nascimento):
-                bissextos_no_caminho += 1
-                
-    # Correção do vetor de tempo: se retrocedemos ao passado, removemos os bissextos da distância fluida
-    if total_dias >= 0:
-        dias_maia = total_dias - bissextos_no_caminho
+    # Determinar a qual ano do Sincronário de 13 Luas a data pertence (Ano Novo em 26 de Julho)
+    if (m < 7) or (m == 7 and d < 26):
+        ano_maia_sincronico = a - 1
     else:
-        dias_maia = total_dias + bissextos_no_caminho
+        ano_maia_sincronico = a
 
-    # Modulação cíclica absoluta no anel de 260 assinaturas galácticas
-    kin = (kin_ancora + dias_maia) % 260
+    # Fórmula matemática da semente de ano maia (Ciclo de 52 anos de Argüelles)
+    # Define o KIN exato que abriu as portas no dia 26 de Julho daquele ano específico
+    constante_ciclo = (ano_maia_sincronico - 1900) % 52
+    tabela_portadores = [
+        114, 219, 64, 169, 14, 119, 224, 69, 174, 19, 124, 229, 74, 179, 24, 129, 234, 79, 184, 29, 
+        134, 239, 84, 189, 34, 139, 244, 89, 194, 39, 144, 249, 94, 199, 44, 149, 254, 99, 204, 49, 
+        154, 259, 104, 209, 54, 159, 4, 109, 214, 59, 164, 9
+    ]
+    kin_semente_ano = tabela_portadores[constante_ciclo]
+
+    # Calcular os dias decorridos a partir de 26 de Julho gregoriano
+    data_ano_novo = datetime.date(ano_maia_sincronico, 7, 26)
+    data_aniversario = datetime.date(a, m, d)
+    
+    # Tratamento do Protocolo Bissexto (0.0 Hunab Ku) -> Dia nulo
+    if m == 2 and d == 29:
+        data_aniversario = datetime.date(a, 2, 28)
+
+    dias_passados = (data_aniversario - data_ano_novo).days
+
+    # Se o intervalo cruzar um dia 29 de fevereiro, nós removemos esse dia da contagem (Dia Nulo)
+    if ano_maia_sincronico % 4 == 0 and data_ano_novo <= datetime.date(ano_maia_sincronico, 2, 29) <= data_aniversario:
+        dias_passados -= 1
+    elif a % 4 == 0 and data_ano_novo >= datetime.date(ano_maia_sincronico, 2, 29) >= data_aniversario:
+        dias_passados += 1
+
+    # Cálculo modular definitivo do KIN sobre a engrenagem cíclica de 260 assinaturas
+    kin = (kin_semente_ano + dias_passados) % 260
     if kin <= 0:
         kin += 260
-        
-    # Extração matemática estrutural do Tom Galáctico (1 a 13)
+
+    # Extração das Engrenagens do Kin baseadas no Manifesto Enviado
+    # Tom Galáctico (1 a 13)
     tom = ((kin - 1) % 13) + 1
         
-    # Alinhamento da Roda dos Selos (Do Dragão [1] ao Sol [20])
+    # Selo Solar (1 a 20) alinhado rigorosamente do Dragão (1) ao Sol (20)
     selos_lista = [
         "Dragão Vermelho", "Vento Branco", "Noite Azul", "Semente Amarela", 
         "Serpente Vermelha", "Enlaçador de Mundos Branco", "Mão Azul", "Estrela Amarela", 
