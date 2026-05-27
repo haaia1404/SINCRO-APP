@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO UNIVERSAL (CONCEITO FREGUÊNCIA 13:20 & 26 DE JULHO)
+# 2. MOTOR MATEMÁTICO UNIVERSAL (CONCEITO FREGUÊNCIA 13:20 & MATRIZ IMAGEM)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -81,14 +81,13 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. CÁLCULO MAIA ANCROADO EM 26 DE JULHO (CONFORME A LEI DO TEMPO)
+    # C. MATRIZ DO TZOLKIN ANCORADA (26 DE JULHO - ACORDO LEI DO TEMPO)
     # ---------------------------------------------------------------------
-    # Mapeamento estável dos KINs sementes de início de cada Ano Novo Maia (26 de Julho)
+    # Constantes oficiais do KIN portador do ano (26 de julho) para sincronização perfeita
     KIN_ANO_NOVO_MAIA = {
         1955: 144, 1975: 34, 2000: 144, 2001: 249, 2025: 144, 2026: 249
     }
     
-    # Define a qual ciclo de 13 Luas a data pertence
     if (m < 7) or (m == 7 and d < 26):
         ano_base_maia = a - 1
     else:
@@ -97,36 +96,38 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     data_ancora_julho = datetime.date(ano_base_maia, 7, 26)
     data_alvo = datetime.date(a, m, d)
     
-    # Protocolo 29 de Fevereiro (Dia Nulo 0.0 Hunab Ku)
-    # Congela na frequência do dia anterior (28 de fevereiro)
+    # Protocolo 29 de Fevereiro (0.0 Hunab Ku) -> Dia nulo, repete a frequência anterior
     if m == 2 and d == 29:
         data_alvo = datetime.date(a, 2, 28)
         
     dias_corridos = (data_alvo - data_ancora_julho).days
     
-    # Amortecimento de bissextos: ignora o dia 29/02 se a contagem passar por ele
+    # Tratamento matemático para pular o bissexto gregoriano na contagem
     if ano_base_maia % 4 == 0 and data_ancora_julho <= datetime.date(ano_base_maia, 2, 29) <= data_alvo:
         dias_corridos -= 1
     elif a % 4 == 0 and data_ancora_julho >= datetime.date(ano_base_maia, 2, 29) >= data_alvo:
         dias_corridos += 1
 
-    # Recupera o KIN inicial do ano ou usa fallback harmônico
     kin_semente = KIN_ANO_NOVO_MAIA.get(ano_base_maia, int(((ano_base_maia - 1900) * 105.25) % 260))
     
-    # Modulação harmônica sobre a matriz de 260 KINs
+    # Modulação harmônica absoluta sobre o ciclo estável de 260 KINs
     kin = (kin_semente + dias_corridos) % 260
     if kin <= 0:
         kin += 260
         
-    # Tom Cósmico / Pulsar (1 a 13)
-    tom = kin % 13
-    if tom == 0:
-        tom = 13
+    # CÁLCULO DO TOM CORRIGIDO: Alinhamento modular baseado na Matriz Vigésima (1 a 13)
+    tom = ((kin - 1) % 13) + 1
         
-    # ORDEM CIRCULAR: Do Dragão Vermelho (1) ao Sol Amarelo (20)
-    # Onde Sol % 20 == 0 ocupando o índice 0 da lista perpétua
-    selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
-    selo = selos_lista[kin % 20]
+    # LISTA DE SELOS ORDENADA RIGOROSAMENTE: Do Dragão Vermelho (1) ao Sol Amarelo (20)
+    # Correção do índice: KIN 1 -> Dragão, KIN 20 -> Sol
+    selos_lista = [
+        "Dragão Vermelho", "Vento Branco", "Noite Azul", "Semente Amarela", 
+        "Serpente Vermelha", "Enlaçador de Mundos Branco", "Mão Azul", "Estrela Amarela", 
+        "Lua Vermelha", "Cachorro Branco", "Macaco Azul", "Humano Amarelo", 
+        "Caminhante do Céu Vermelho", "Mago Branco", "Águia Azul", "Guerreiro Amarelo", 
+        "Terra Vermelha", "Espelho Branco", "Tormenta Azul", "Sol Amarelo"
+    ]
+    selo = selos_lista[(kin - 1) % 20]
 
     # ---------------------------------------------------------------------
     # D. Numerologia Pitagórica
@@ -200,7 +201,7 @@ if st.button("Alinhar Portal Cósmico"):
                     st.success("✨ Portal Alinhado com Sucesso Absoluto!")
                     st.markdown(f"### 🔮 {ui['titulo']}: {int(dia):02d}/{int(mes):02d}/{ano}")
                     st.markdown(f"**👤 {ui['nome']}:** {nome}")
-                    st.markdown(f"**🌀 {ui['perfil']}:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
+                    st.markdown(f"** {ui['perfil']}:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
                     st.markdown(f"**✨ {ui['astros']}:** Signo: {meta['signo']} | Anjo: {meta['anjo']}")
                     st.markdown(f"**🔢 {ui['num']}:** Destino: {meta['destino']} | Expressão: {meta['expressao']}")
                     
