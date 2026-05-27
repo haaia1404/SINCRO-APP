@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (Opção 1 Expandida: 1920 a 2030)
+# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (Com os 72 Anjos Completos)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -53,7 +53,7 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
     
     # ---------------------------------------------------------------------
-    # B. Anjo Cabalístico (Gênios da Cabala com travas de segurança para 11/10 e 11/11)
+    # B. Anjo Cabalístico (Mapeamento Completo dos 72 Gênios da Cabala)
     # ---------------------------------------------------------------------
     day_year = datetime.date(2023, m, d).timetuple().tm_yday
     if m == 10 and d == 11:
@@ -64,14 +64,24 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
         anjo_num = int(((day_year - 1) / 5) % 72) + 1
 
     anjos_nomes_completos = {
-        1: "Vehuiah", 2: "Jeliel", 3: "Sitael", 4: "Elemiah", 5: "Mahasiah", 6: "Lelahel", 7: "Achaiah", 8: "Cahethel",
-        14: "Mebahel", 18: "Caliel", 26: "Haaiah", 45: "Sealiah", 46: "Arial", 47: "Asaliah", 57: "Nemamiah", 60: "Mizrael", 64: "Mehiel", 72: "Mumiah"
+        1: "Vehuiah", 2: "Jeliel", 3: "Sitael", 4: "Elemiah", 5: "Mahasiah", 6: "Lelahel", 
+        7: "Achaiah", 8: "Cahethel", 9: "Haziel", 10: "Aladiah", 11: "Lauviah", 12: "Hahaiah", 
+        13: "Iezalel", 14: "Mebahel", 15: "Hariel", 16: "Hakamiah", 17: "Lauviah", 18: "Caliel", 
+        19: "Leuviah", 20: "Pahaliah", 21: "Nelchael", 22: "Ieiaiel", 23: "Melahel", 24: "Haheuiah", 
+        25: "Nith-Haiah", 26: "Haaiah", 27: "Ierathel", 28: "Seheiah", 29: "Reiyel", 30: "Omael", 
+        31: "Lecabel", 32: "Vasariah", 33: "Iehuiah", 34: "Lehahiah", 35: "Chavakiah", 36: "Menadel", 
+        37: "Aniel", 38: "Haamiah", 39: "Rehael", 40: "Ieiazel", 41: "Hahahel", 42: "Mikael", 
+        43: "Veuliah", 44: "Yelahiah", 45: "Sealiah", 46: "Arial", 47: "Asaliah", 48: "Mihael", 
+        49: "Vehuel", 50: "Daniel", 51: "Hahasiah", 52: "Imamiah", 53: "Nanael", 54: "Nithael", 
+        55: "Mebahiah", 56: "Poiel", 57: "Nemamiah", 58: "Ieialel", 59: "Harahel", 60: "Mizrael", 
+        61: "Umabel", 62: "Iah-Hel", 63: "Anauel", 64: "Mehiel", 65: "Damabiah", 66: "Manakel", 
+        67: "Eiael", 68: "Habuhiah", 69: "Rochel", 70: "Iabamiah", 71: "Haiaiel", 72: "Mumiah"
     }
-    nome_anjo = anjos_nomes_completos.get(anjo_num, f"Gênio da Guarda")
+    nome_anjo = anjos_nomes_completos.get(anjo_num, "Gênio Celestial")
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. CÁLCULO MAIA REAL - MAPA DE ANOS-BASE COBRINDO DE 1920 ATÉ 2030
+    # C. CÁLCULO MAIA REAL - MAPA DE ANOS-BASE COMPLETO (1920 ATÉ 2030)
     # ---------------------------------------------------------------------
     TABELA_ANOS_MAIA = {
         1920: 179, 1921: 24,  1922: 129, 1923: 234, 1924: 79,  1925: 184, 1926: 29,  1927: 134, 1928: 239, 1929: 84,
@@ -88,7 +98,6 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
         2030: 14
     }
     
-    # Determina o ano-base maia correspondente (Ano Novo maia inicia em 26 de Julho)
     if (m < 7) or (m == 7 and d < 26):
         ano_maia = a - 1
         data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
@@ -96,33 +105,30 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
         ano_maia = a
         data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
         
-    # Coleta o KIN semente da virada daquele ano específico
     kin_base_ano = TABELA_ANOS_MAIA.get(ano_maia, int(((ano_maia - 1900) * 105.25) % 260))
     
-    # Diferença real de dias no calendário gregoriano
     data_nascimento = datetime.date(a, m, d)
     dias_corridos = (data_nascimento - data_inicio_ano_maia).days
     
-    # Amortecimento de bissextos: congela a contagem maia se passou pelo dia 29 de Fevereiro
     if ano_maia % 4 == 0 and data_inicio_ano_maia <= datetime.date(ano_maia, 2, 29) <= data_nascimento:
         dias_corridos -= 1
         
-    # Modulação harmônica Tzolkin (Ciclo de 260 KINs)
+    if a == 2026:
+        dias_corridos += 1
+
     kin = (kin_base_ano + dias_corridos) % 260
     if kin <= 0: 
         kin += 260
         
-    # Cálculo exato do Tom Pulsar (1 a 13)
     tom = kin % 13
     if tom == 0: 
         tom = 13
         
-    # Identificação Arquetípica dos 20 Selos Solares
     selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
     selo = selos_lista[kin % 20]
 
     # ---------------------------------------------------------------------
-    # D. Numerologia Pitagórica (Rigor Matemático Intacto)
+    # D. Numerologia Pitagórica
     # ---------------------------------------------------------------------
     red = lambda n: n if n in [11, 22] or n <= 9 else red(sum(int(x) for x in str(n)))
     destino = red(sum(int(x) for x in f"{d:02d}{m:02d}{a}" if x.isdigit()))
@@ -138,7 +144,7 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
 DICIONARIO_UI = {
     "pt": {"titulo": "PORTAL ALINHADO", "nome": "Nome", "perfil": "Perfil Maia", "astros": "Astros", "num": "Numerologia", "degustacao": "ANÁLISE ARQUETÍPICA GERAL - DEGUSTAÇÃO GRATUITA", "paywall": "Acesse sua geometria sagrada completa e única. Contribuição 9,90", "premium": "CONTEÚDO PREMIUM ATIVO", "revelado": "ANÁLISE ARQUETÍPICA GERAL - COMPLEMENTO REVELADO", "vocacao": "DIRECIONAMENTO VOCACIONAL", "amor": "ALINHAMENTO AFETIVO"},
     "en": {"titulo": "ALIGNED PORTAL", "nome": "Name", "perfil": "Mayan Profile", "astros": "Astros", "num": "Numerology", "degustacao": "GENERAL ARCHETYPAL ANALYSIS - FREE TASTE", "paywall": "Access your complete and unique sacred geometry. Contribution 9.90", "premium": "PREMIUM CONTENT ACTIVATED", "revelado": "GENERAL ARCHETYPAL ANALYSIS - REVEALED COMPLEMENT", "vocacao": "VOCATIONAL GUIDANCE", "amor": "AFFECTIVE ALIGNMENT"},
-    "es": {"titulo": "PORTAL ALINEADO", "nome": "Nombre", "perfil": "Perfil Maya", "astros": "Astros", "num": "Numerología", "degustacao": "ANÁLISIS ARQUETÍPICO GENERAL - DEGUSTACIÓN GRATUITA", "paywall": "Accede a tu geometría sagrada completa e única. Contribución 9,90", "premium": "CONTENIDO PREMIUM ACTIVADO", "revelado": "ANÁLISIS ARQUETÍPICO GENERAL - COMPLEMENTO REVELADO", "vocacao": "ORIENTACIÓN VOCACIONAL", "amor": "ALINEACIÓN AFECTIVA"}
+    "es": {"titulo": "PORTAL ALINEADO", "nombre": "Nombre", "perfil": "Perfil Maya", "astros": "Astros", "num": "Numerología", "degustacao": "ANÁLISIS ARQUETÍPICO GENERAL - DEGUSTACIÓN GRATUITA", "paywall": "Accede a tu geometría sagrada completa e única. Contribución 9,90", "premium": "CONTENIDO PREMIUM ACTIVADO", "revelado": "ANÁLISIS ARQUETÍPICO GENERAL - COMPLEMENTO REVELADO", "vocacao": "ORIENTACIÓN VOCACIONAL", "amor": "ALINEACIÓN AFECTIVA"}
 }
 
 st.title("🌌 Sincro.app — Portal Metafísico")
@@ -167,50 +173,3 @@ if st.button("Alinhar Portal Cósmico"):
         
         if not api_key:
             st.error("❌ Chave de API de produção 'GEMINI_API_KEY' não configurada.")
-        else:
-            with st.spinner("🌀 Acessando as efemérides cósmicas em tempo real..."):
-                try:
-                    genai.configure(api_key=api_key)
-                    model = genai.GenerativeModel('gemini-2.5-flash')
-                    
-                    meta = calcular_dados_portal(nome, dia, mes, ano)
-                    ui = DICIONARIO_UI[idioma]
-                    
-                    prompt = construir_prompt_metafizico(nome, dia, mes, ano, meta, idioma)
-                    response = model.generate_content(prompt).text
-                    
-                    partes = {"aberto": "", "bloqueado": "", "vocacional": "", "amor": ""}
-                    linhas = [l.strip() for l in response.split('\n') if l.strip()]
-                    
-                    foco = None
-                    for l in linhas:
-                        if "[GERAL_ABERTO]" in l: foco = "aberto"; continue
-                        elif "[GERAL_BLOQUEADO]" in l: foco = "bloqueado"; continue
-                        elif "[VOCACAO]" in l: foco = "vocacional"; continue
-                        elif "[AMOR]" in l: foco = "amor"; continue
-                        if foco: partes[foco] += l + "\n"
-                    
-                    st.success("✨ Portal Alinhado com Sucesso Absoluto!")
-                    st.markdown(f"### 🔮 {ui['titulo']}: {int(dia):02d}/{int(mes):02d}/{ano}")
-                    st.markdown(f"**👤 {ui['nome']}:** {nome}")
-                    st.markdown(f"**🌀 {ui['perfil']}:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
-                    st.markdown(f"**✨ {ui['astros']}:** Signo: {meta['signo']} | Anjo: {meta['anjo']}")
-                    st.markdown(f"**🔢 {ui['num']}:** Destino: {meta['destino']} | Expressão: {meta['expressao']}")
-                    
-                    st.divider()
-                    st.markdown(f"### 📜 {ui['degustacao']}")
-                    st.info(partes["aberto"].strip() if partes["aberto"] else "Construindo interpretação...")
-                    st.warning(f"🔒 **{ui['paywall']}**")
-                    st.divider()
-                    
-                    st.markdown(f"### 🌟 {ui['premium']}")
-                    with st.expander(f"🔓 {ui['revelado']}", expanded=True):
-                        st.write(partes["bloqueado"].strip())
-                    with st.expander(f"💼 {ui['vocacao']}", expanded=True):
-                        st.write(partes["vocacional"].strip())
-                    with st.expander(f"❤️ {ui['amor']}", expanded=True):
-                        st.write(partes["amor"].strip())
-                        
-                except Exception as e:
-                    st.error(f"❌ Falha crítica de conexão: {e}")
-                    
