@@ -38,7 +38,7 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO REAL E UNIVERSAL (Com os 72 Anjos Completos)
+# 2. MOTOR MATEMÁTICO DE ANCORAGEM ABSOLUTA (INFALÍVEL - 1920 A 2030)
 # =========================================================================
 def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
     d = int(str(dia_str).lstrip('0') or 0)
@@ -53,7 +53,7 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
     
     # ---------------------------------------------------------------------
-    # B. Anjo Cabalístico (Mapeamento Completo dos 72 Gênios da Cabala)
+    # B. Anjo Cabalístico (Mapeamento Completo de 1 a 72)
     # ---------------------------------------------------------------------
     day_year = datetime.date(2023, m, d).timetuple().tm_yday
     if m == 10 and d == 11:
@@ -81,49 +81,42 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
 
     # ---------------------------------------------------------------------
-    # C. CÁLCULO MAIA REAL - MAPA DE ANOS-BASE COMPLETO (1920 ATÉ 2030)
+    # C. ALGORITMO DE CORREÇÃO TZOLKIN ABSOLUTO (ÂNCORA: 01/01/1973 = KIN 130)
     # ---------------------------------------------------------------------
-    TABELA_ANOS_MAIA = {
-        1920: 179, 1921: 24,  1922: 129, 1923: 234, 1924: 79,  1925: 184, 1926: 29,  1927: 134, 1928: 239, 1929: 84,
-        1930: 189, 1931: 34,  1932: 139, 1933: 244, 1934: 94,  1935: 199, 1936: 44,  1937: 149, 1938: 254, 1939: 99,
-        1940: 204, 1941: 49,  1942: 154, 1943: 259, 1944: 104, 1945: 22,  1946: 127, 1947: 232, 1948: 77,  1949: 182,
-        1950: 27,  1951: 132, 1952: 237, 1953: 82,  1954: 187, 1955: 32,  1956: 137, 1957: 242, 1958: 92,  1959: 197,
-        1960: 42,  1961: 147, 1962: 252, 1963: 97,  1964: 202, 1965: 47,  1966: 152, 1967: 257, 1968: 102, 1969: 207,
-        1970: 52,  1971: 157, 1972: 2,   1973: 107, 1974: 212, 1975: 253, 1976: 118, 1977: 103, 1978: 208, 1979: 53,
-        1980: 158, 1981: 3,   1982: 108, 1983: 213, 1984: 58,  1985: 163, 1986: 8,   1987: 113, 1988: 218, 1989: 63,
-        1990: 168, 1991: 13,  1992: 118, 1993: 223, 1994: 114, 1995: 219, 1996: 64,  1997: 169, 1998: 259, 1999: 119,
-        2000: 224, 2001: 69,  2002: 174, 2003: 19,  2004: 124, 2005: 229, 2006: 74,  2007: 179, 2008: 24,  2009: 129,
-        2010: 234, 2011: 79,  2012: 184, 2013: 29,  2014: 134, 2015: 239, 2016: 84,  2017: 189, 2018: 34,  2019: 139,
-        2020: 244, 2021: 94,  2022: 199, 2023: 44,  2024: 149, 2025: 254, 2026: 114, 2027: 219, 2028: 64,  2029: 169,
-        2030: 14
-    }
+    data_alvo = datetime.date(a, m, d)
+    data_ancora = datetime.date(1973, 1, 1)
+    kin_ancora = 130
     
-    if (m < 7) or (m == 7 and d < 26):
-        ano_maia = a - 1
-        data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
+    # Diferença bruta em dias lineares
+    delta_dias = (data_alvo - data_ancora).days
+    
+    # Contagem e remoção exata dos dias 29 de fevereiro no intervalo
+    bissextos_ignorados = 0
+    menor_data, maior_data = (data_alvo, data_ancora) if delta_dias < 0 else (data_ancora, data_alvo)
+    
+    for ano_corrente in range(menor_data.year, maior_data.year + 1):
+        if ano_corrente % 4 == 0:
+            dia_bissexto = datetime.date(ano_corrente, 2, 29)
+            if menor_data <= dia_bissexto <= maior_data:
+                bissextos_ignorados += 1
+                
+    # Ajusta os dias retirando a distorção dos bissextos gregorianos
+    if delta_dias < 0:
+        dias_ajustados = delta_dias + bissextos_ignorados
     else:
-        ano_maia = a
-        data_inicio_ano_maia = datetime.date(ano_maia, 7, 26)
-        
-    kin_base_ano = TABELA_ANOS_MAIA.get(ano_maia, int(((ano_maia - 1900) * 105.25) % 260))
-    
-    data_nascimento = datetime.date(a, m, d)
-    dias_corridos = (data_nascimento - data_inicio_ano_maia).days
-    
-    if ano_maia % 4 == 0 and data_inicio_ano_maia <= datetime.date(ano_maia, 2, 29) <= data_nascimento:
-        dias_corridos -= 1
-        
-    if a == 2026:
-        dias_corridos += 1
+        dias_ajustados = delta_dias - bissextos_ignorados
 
-    kin = (kin_base_ano + dias_corridos) % 260
+    # Modulação cíclica sobre a base geométrica maia de 260 KINs
+    kin = (kin_ancora + dias_ajustados) % 260
     if kin <= 0: 
         kin += 260
         
+    # Cálculo preciso do Tom
     tom = kin % 13
     if tom == 0: 
         tom = 13
         
+    # Mapeamento oficial dos Selos Tzolkin
     selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador de Mundos", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante do Céu", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
     selo = selos_lista[kin % 20]
 
