@@ -173,3 +173,49 @@ if st.button("Alinhar Portal Cósmico"):
         
         if not api_key:
             st.error("❌ Chave de API de produção 'GEMINI_API_KEY' não configurada.")
+        else:
+            with st.spinner("🌀 Acessando as efemérides cósmicas em tempo real..."):
+                try:
+                    genai.configure(api_key=api_key)
+                    model = genai.GenerativeModel('gemini-2.5-flash')
+                    
+                    meta = calcular_dados_portal(nome, dia, mes, ano)
+                    ui = DICIONARIO_UI[idioma]
+                    
+                    prompt = construir_prompt_metafizico(nome, dia, mes, ano, meta, idioma)
+                    response = model.generate_content(prompt).text
+                    
+                    partes = {"aberto": "", "bloqueado": "", "vocacional": "", "amor": ""}
+                    linhas = [l.strip() for l in response.split('\n') if l.strip()]
+                    
+                    foco = None
+                    for l in linhas:
+                        if "[GERAL_ABERTO]" in l: foco = "aberto"; continue
+                        elif "[GERAL_BLOQUEADO]" in l: foco = "bloqueado"; continue
+                        elif "[VOCACAO]" in l: foco = "vocacional"; continue
+                        elif "[AMOR]" in l: foco = "amor"; continue
+                        if foco: partes[foco] += l + "\n"
+                    
+                    st.success("✨ Portal Alinhado com Sucesso Absoluto!")
+                    st.markdown(f"### 🔮 {ui['titulo']}: {int(dia):02d}/{int(mes):02d}/{ano}")
+                    st.markdown(f"**👤 {ui['nome']}:** {nome}")
+                    st.markdown(f"**🌀 {ui['perfil']}:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
+                    st.markdown(f"**✨ {ui['astros']}:** Signo: {meta['signo']} | Anjo: {meta['anjo']}")
+                    st.markdown(f"**🔢 {ui['num']}:** Destino: {meta['destino']} | Expressão: {meta['expressao']}")
+                    
+                    st.divider()
+                    st.markdown(f"### 📜 {ui['degustacao']}")
+                    st.info(partes["aberto"].strip() if partes["aberto"] else "Construindo interpretação...")
+                    st.warning(f"🔒 **{ui['paywall']}**")
+                    st.divider()
+                    
+                    st.markdown(f"### 🌟 {ui['premium']}")
+                    with st.expander(f"🔓 {ui['revelado']}", expanded=True):
+                        st.write(partes["bloqueado"].strip())
+                    with st.expander(f"💼 {ui['vocacao']}", expanded=True):
+                        st.write(partes["vocacional"].strip())
+                    with st.expander(f"❤️ {ui['amor']}", expanded=True):
+                        st.write(partes["amor"].strip())
+                        
+                except Exception as e:
+                    st.error(f"❌ Falha crítica de conexão: {e}")
