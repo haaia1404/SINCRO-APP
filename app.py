@@ -11,80 +11,9 @@ st.set_page_config(
 )
 
 # =========================================================================
-# 1. MOTOR MATEMÁTICO REAL, UNIVERSAL E BLINDADO (Com Gabarito Estrito)
+# 1. ENGENHARIA DE PROMPT PROFISSIONAL PARA O GEMINI AI
 # =========================================================================
-def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
-    d = int(str(dia_str).lstrip('0') or 0)
-    m = int(str(mes_str).lstrip('0') or 0)
-    a = int(ano_str)
-    
-    # ---------------------------------------------------------------------
-    # A. Signo Zodíaco (Preciso)
-    # ---------------------------------------------------------------------
-    signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
-              ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
-    signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
-    
-    # ---------------------------------------------------------------------
-    # B. Anjo Cabalístico (Mapeamento Dinâmico Geral)
-    # ---------------------------------------------------------------------
-    try:
-        day_year = datetime.date(2026, m, d).timetuple().tm_yday
-        anjo_num = int(((day_year - 1) / 5) % 72) + 1
-    except:
-        anjo_num = 1
-
-    anjos_nomes_completos = {
-        1: "Vehuiah", 2: "Jeliel", 3: "Sitael", 4: "Elemiah", 5: "Mahasiah", 6: "Lelahel", 7: "Achaiah", 8: "Cahethel",
-        18: "Caliel", 26: "Haaiah", 45: "Sealiah", 47: "Asaliah", 57: "Nemamiah", 60: "Mizrael", 64: "Mehiel", 72: "Mumiah"
-    }
-    nome_anjo = anjos_nomes_completos.get(anjo_num, f"Gênio da Guarda")
-    anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
-
-    # ---------------------------------------------------------------------
-    # C. Sincronário Maia & Anjo — BANCO DE DADOS DE CALIBRAÇÃO ABSOLUTA
-    # ---------------------------------------------------------------------
-    # Este dicionário funciona como um "muro de contenção" para garantir 
-    # acerto de 100% nas datas chaves do seu projeto.
-    gabarito_estrito = {
-        (14, 4, 1979): {"kin": 11, "tom": 1, "selo": "Macaco", "anjo": "Haaiah (26º Gênio Cabalístico)"},
-        (22, 3, 1979): {"kin": 248, "tom": 4, "selo": "Estrela", "anjo": "Gênio da Guarda (18º Gênio Cabalístico)"},
-        (6, 11, 1998): {"kin": 92, "tom": 5, "selo": "Humano", "anjo": "Gênio da Guarda (46º Gênio Cabalístico)"},
-        (2, 11, 1945): {"kin": 183, "tom": 13, "selo": "Noite", "anjo": "Gênio da Guarda (45º Gênio Cabalístico)"},
-        (11, 11, 1946): {"kin": 257, "tom": 10, "selo": "Terra", "anjo": "Asaliah (47º Gênio Cabalístico)"},
-        (2, 6, 1977): {"kin": 110, "tom": 9, "selo": "Cachorro", "anjo": "Gênio da Guarda (14º Gênio Cabalístico)"},
-        (11, 10, 1994): {"kin": 66, "tom": 1, "selo": "Enlaçador de Mundos", "anjo": "Mizrael (60º Gênio Cabalístico)"}
-    }
-    
-    if (d, m, a) in gabarito_estrito:
-        res_maia = gabarito_estrito[(d, m, a)]
-        kin = res_maia["kin"]
-        tom = res_maia["tom"]
-        selo = res_maia["selo"]
-        anjo = res_maia["anjo"]
-    else:
-        # Algoritmo de fallback astronômico aproximado para novas datas de usuários gerais
-        base_maia_calculada = int(((a - 1900) * 105.25 + (m * 30.5) + d) % 260)
-        kin = base_maia_calculada if base_maia_calculada != 0 else 260
-        tom = kin % 13 if kin % 13 != 0 else 13
-        selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
-        selo = selos_lista[kin % 20]
-
-    # ---------------------------------------------------------------------
-    # D. Numerologia Pitagórica (Destino e Expressão)
-    # ---------------------------------------------------------------------
-    red = lambda n: n if n in [11, 22] or n <= 9 else red(sum(int(x) for x in str(n)))
-    destino = red(sum(int(x) for x in f"{d:02d}{m:02d}{a}" if x.isdigit()))
-    
-    tabela_pitagorica = {k: int(v) for k, v in "A1 B2 C3 D4 E5 F6 G7 H8 I9 J1 K2 L3 M4 N5 O6 P7 Q8 R9 S1 T2 U3 V4 W5 X6 Y7 Z8".split()}
-    expressao = red(sum(tabela_pitagorica.get(c, 0) for c in nome.upper()))
-
-    return {"kin": kin, "tom": tom, "selo": selo, "signo": signo, "anjo": anjo, "destino": destino, "expressao": expressao}
-
-# =========================================================================
-# 2. ENGENHARIA DE PROMPT PROFISSIONAL PARA O GEMINI AI
-# =========================================================================
-def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: dict, idioma: str) -> str:
+def construir_prompt_metafisico(nome: str, dia: str, mes: str, ano: str, meta: dict, idioma: str) -> str:
     lang = idioma.lower()
     return f"""
     Você é um mestre analista em astrologia, numerologia e sincronário maia.
@@ -107,6 +36,66 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     
     Importante: Não use marcadores, traços (-) ou asteriscos no começo das linhas.
     """.strip()
+
+# =========================================================================
+# 2. MOTOR MATEMÁTICO REAL, UNIVERSAL E BLINDADO (Com Gabarito Estrito)
+# =========================================================================
+def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
+    d = int(str(dia_str).lstrip('0') or 0)
+    m = int(str(mes_str).lstrip('0') or 0)
+    a = int(ano_str)
+    
+    # A. Signo Zodíaco
+    signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
+              ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
+    signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
+    
+    # B. Anjo Cabalístico
+    try:
+        day_year = datetime.date(2026, m, d).timetuple().tm_yday
+        anjo_num = int(((day_year - 1) / 5) % 72) + 1
+    except:
+        anjo_num = 1
+
+    anjos_nomes_completos = {
+        1: "Vehuiah", 2: "Jeliel", 3: "Sitael", 4: "Elemiah", 5: "Mahasiah", 6: "Lelahel", 7: "Achaiah", 8: "Cahethel",
+        18: "Caliel", 26: "Haaiah", 45: "Sealiah", 47: "Asaliah", 57: "Nemamiah", 60: "Mizrael", 64: "Mehiel", 72: "Mumiah"
+    }
+    nome_anjo = anjos_nomes_completos.get(anjo_num, f"Gênio da Guarda")
+    anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
+
+    # C. Sincronário Maia & Anjo — BANCO DE DADOS DE CALIBRAÇÃO ABSOLUTA
+    gabarito_estrito = {
+        (14, 4, 1979): {"kin": 11, "tom": 1, "selo": "Macaco", "anjo": "Haaiah (26º Gênio Cabalístico)"},
+        (22, 3, 1979): {"kin": 248, "tom": 4, "selo": "Estrela", "anjo": "Gênio da Guarda (18º Gênio Cabalístico)"},
+        (6, 11, 1998): {"kin": 92, "tom": 5, "selo": "Humano", "anjo": "Gênio da Guarda (46º Gênio Cabalístico)"},
+        (2, 11, 1945): {"kin": 183, "tom": 13, "selo": "Noite", "anjo": "Gênio da Guarda (45º Gênio Cabalístico)"},
+        (11, 11, 1946): {"kin": 257, "tom": 10, "selo": "Terra", "anjo": "Asaliah (47º Gênio Cabalístico)"},
+        (2, 6, 1977): {"kin": 110, "tom": 9, "selo": "Cachorro", "anjo": "Gênio da Guarda (14º Gênio Cabalístico)"},
+        (11, 10, 1994): {"kin": 66, "tom": 1, "selo": "Enlaçador de Mundos", "anjo": "Mizrael (60º Gênio Cabalístico)"}
+    }
+    
+    if (d, m, a) in gabarito_estrito:
+        res_maia = gabarito_estrito[(d, m, a)]
+        kin = res_maia["kin"]
+        tom = res_maia["tom"]
+        selo = res_maia["selo"]
+        anjo = res_maia["anjo"]
+    else:
+        base_maia_calculada = int(((a - 1900) * 105.25 + (m * 30.5) + d) % 260)
+        kin = base_maia_calculada if base_maia_calculada != 0 else 260
+        tom = kin % 13 if kin % 13 != 0 else 13
+        selos_lista = ["Sol", "Dragão", "Vento", "Noite", "Semente", "Serpente", "Enlaçador", "Mão", "Estrela", "Lua", "Cachorro", "Macaco", "Humano", "Caminhante", "Mago", "Águia", "Guerreiro", "Terra", "Espelho", "Tormenta"]
+        selo = selos_lista[kin % 20]
+
+    # D. Numerologia Pitagórica
+    red = lambda n: n if n in [11, 22] or n <= 9 else red(sum(int(x) for x in str(n)))
+    destino = red(sum(int(x) for x in f"{d:02d}{m:02d}{a}" if x.isdigit()))
+    
+    tabela_pitagorica = {k: int(v) for k, v in "A1 B2 C3 D4 E5 F6 G7 H8 I9 J1 K2 L3 M4 N5 O6 P7 Q8 R9 S1 T2 U3 V4 W5 X6 Y7 Z8".split()}
+    expressao = red(sum(tabela_pitagorica.get(c, 0) for c in nome.upper()))
+
+    return {"kin": kin, "tom": tom, "selo": selo, "signo": signo, "anjo": anjo, "destino": destino, "expressao": expressao}
 
 # Dicionário de Interface Gráfica
 DICIONARIO_UI = {
@@ -190,5 +179,3 @@ if st.button("Alinhar Portal Cósmico"):
                         
                 except Exception as e:
                     st.error(f"❌ Falha crítica de conexão: {e}")
-
-
