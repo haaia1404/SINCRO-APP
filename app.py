@@ -263,20 +263,39 @@ if st.button(ui["botao"]):
                     
                     meta = calcular_dados_portal(nome, dia, mes, ano)
                     
+                    # Chamada do prompt estruturado
                     prompt = construir_prompt_metafizico(nome, dia, mes, ano, meta, idioma)
-                    response = model.generate_content(prompt).text
+                    response_text = model.generate_content(prompt).text
                     
+                    # Dicionário de isolamento das seções
                     partes = {"aberto": "", "bloqueado": "", "vocacional": "", "amor": ""}
-                    linhas = [l.strip() for l in response.split('\n') if l.strip()]
                     
-                    foco = None
-                    for l in linhas:
-                        if "[GERAL_ABERTO]" in l: foco = "aberto"; continue
-                        elif "[GERAL_BLOQUEADO]" in l: foco = "bloqueado"; continue
-                        elif "[VOCACAO]" in l: foco = "vocacional"; continue
-                        elif "[AMOR]" in l: foco = "amor"; continue
-                        if foco: partes[foco] += l + "\n"
-                    
+                    # Sistema robusto de quebra de blocos por tags
+                    def extrair_bloco(texto, tag_inicio, tag_proxima=None):
+                        try:
+                            if tag_inicio in texto:
+                                sub_texto = texto.split(tag_inicio)[1]
+                                if tag_proxima and tag_proxima in sub_texto:
+                                    return sub_texto.split(tag_proxima)[0].strip()
+                                return sub_texto.strip()
+                        except:
+                            pass
+                        return ""
+
+                    # Separa o conteúdo recebido da IA
+                    partes["aberto"] = extrair_bloco(response_text, "[GERAL_ABERTO]", "[GERAL_BLOQUEADO]")
+                    partes["bloqueado"] = extrair_bloco(response_text, "[GERAL_BLOQUEADO]", "[VOCACAO]")
+                    partes["vocacional"] = extrair_bloco(response_text, "[VOCACAO]", "[AMOR]")
+                    partes["amor"] = extrair_bloco(response_text, "[AMOR]")
+
+                    # Mecanismo de contingência anti-vazio
+                    if not partes["aberto"].strip():
+                        partes["aberto"] = response_text[:500] + "..."
+                        partes["bloqueado"] = response_text[500:1500] + "..."
+                        partes["vocacional"] = "Análise disponível no painel Premium."
+                        partes["amor"] = "Análise disponível no painel Premium."
+
+                    # Apresentação Visual da Interface do Usuário
                     st.success(ui["sucesso"])
                     st.markdown(f"### 🔮 {ui['titulo']}: {int(dia):02d}/{int(mes):02d}/{ano}")
                     st.markdown(f"**👤 {ui.get('nome', ui.get('nombre'))}:** {nome}")
@@ -286,17 +305,21 @@ if st.button(ui["botao"]):
                     
                     st.divider()
                     st.markdown(f"### 📜 {ui['degustacao']}")
-                    st.info(partes["aberto"].strip() if partes["aberto"] else "Generando...")
+                    
+                    # Exibe a degustação gratuita de 10 linhas limpa
+                    st.write(partes["aberto"].replace("[GERAL_ABERTO]", "").strip())
+                    
                     st.warning(f"🔒 **{ui['paywall']}**")
                     st.divider()
                     
                     st.markdown(f"### 🌟 {ui['premium']}")
                     with st.expander(f"🔓 {ui['revelado']}", expanded=True):
-                        st.write(partes["bloqueado"].strip())
+                        st.write(partes["bloqueado"].replace("[GERAL_BLOQUEADO]", "").strip())
                     with st.expander(f"💼 {ui['vocacao']}", expanded=True):
-                        st.write(partes["vocacional"].strip())
+                        st.write(partes["vocacional"].replace("[VOCACAO]", "").strip())
                     with st.expander(f"❤️ {ui['amor']}", expanded=True):
-                        st.write(partes["amor"].strip())
+                        st.write(partes["amor"].replace("[AMOR]", "").strip())
                         
                 except Exception as e:
-                    st.error(f"❌ Falha crítica de conexão: {e}")
+                    st.error(f"❌ Falha crítica de conexão ou processamento: {e}")
+                    
