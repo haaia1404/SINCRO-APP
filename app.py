@@ -38,101 +38,136 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTOR MATEMÁTICO UNIVERSAL RECALIBRADO
+# 2. MOTORES MATEMÁTICOS CONCEITUAIS
 # =========================================================================
-def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
-    d = int(str(dia_str).lstrip('0') or 0)
-    m = int(str(mes_str).lstrip('0') or 0)
-    a = int(ano_str)
-    
-    # ---------------------------------------------------------------------
-    # A. Signo Zodíaco
-    # ---------------------------------------------------------------------
-    signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
-              ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
-    signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
-    
-    # ---------------------------------------------------------------------
-    # B. Anjo Cabalístico (Mapeamento Tradicional dos 72 Gênios por Graus)
-    # ---------------------------------------------------------------------
-    try:
-        data_atual = datetime.date(2023, m, d)
-    except ValueError:
-        data_atual = datetime.date(2023, 2, 28)
-        
-    data_inicio = datetime.date(2023, 3, 20)  # Início em 0° de Áries
-    dias_decorridos = (data_atual - data_inicio).days
-    if dias_decorridos < 0:
-        dias_decorridos += 365
-        
-    anjo_num = int(dias_decorridos / 5) + 1
-    if anjo_num > 72:
-        anjo_num = 72
 
-    # Caso especial de ajuste fino para o alinhamento de datas críticas solicitadas
-    if m == 4 and d == 14:
-        anjo_num = 26  # Haaiah
-
-    anjos_nomes_completos = {
-        1: "Vehuiah", 2: "Jeliel", 3: "Sitael", 4: "Elemiah", 5: "Mahasiah", 6: "Lelahel", 
-        7: "Achaiah", 8: "Cahethel", 9: "Haziel", 10: "Aladiah", 11: "Lauviah", 12: "Hahaiah", 
-        13: "Iezalel", 14: "Mebahel", 15: "Hariel", 16: "Hakamiah", 17: "Lauviah", 18: "Caliel", 
-        19: "Leuviah", 20: "Pahaliah", 21: "Nelchael", 22: "Ieiaiel", 23: "Melahel", 24: "Haheuiah", 
-        25: "Nith-Haiah", 26: "Haaiah", 27: "Ierathel", 28: "Seheiah", 29: "Reiyel", 30: "Omael", 
-        31: "Lecabel", 32: "Vasariah", 33: "Iehuiah", 34: "Lehahiah", 35: "Chavakiah", 36: "Menadel", 
-        37: "Aniel", 38: "Haamiah", 39: "Rehael", 40: "Ieiazel", 41: "Hahahel", 42: "Mikael", 
-        43: "Veuliah", 44: "Yelahiah", 45: "Sealiah", 46: "Arial", 47: "Asaliah", 48: "Mihael", 
-        49: "Vehuel", 50: "Daniel", 51: "Hahasiah", 52: "Imamiah", 53: "Nanael", 54: "Nithael", 
-        55: "Mebahiah", 56: "Poiel", 57: "Nemamiah", 58: "Ieialel", 59: "Harahel", 60: "Mizrael", 
-        61: "Umabel", 62: "Iah-Hel", 63: "Anauel", 64: "Mehiel", 65: "Damabiah", 66: "Manakel", 
-        67: "Eiael", 68: "Habuhiah", 69: "Rochel", 70: "Iabamiah", 71: "Haiaiel", 72: "Mumiah"
-    }
-    nome_anjo = anjos_nomes_completos.get(anjo_num, "Gênio Celestial")
-    anjo = f"{nome_anjo} ({anjo_num}º Gênio Cabalístico)"
-
-    # ---------------------------------------------------------------------
-    # C. SINCRO MAIA (Constantes de Ciclo Puro sem Âncoras Estáticas Fictícias)
-    # ---------------------------------------------------------------------
-    if (m < 7) or (m == 7 and d < 26):
-        ano_maia_sincronico = a - 1
-    else:
-        ano_maia_sincronico = a
-
-    # Correção matemática fina da semente do ano (Constante cosmológica estável)
-    constante_ciclo = (ano_maia_sincronico - 1900) % 52
-    tabela_portadores = [
-        114, 219, 64, 169, 14, 119, 224, 69, 174, 19, 124, 229, 74, 179, 24, 129, 234, 79, 184, 29, 
-        134, 239, 84, 189, 34, 139, 244, 89, 194, 39, 144, 249, 94, 199, 44, 149, 254, 99, 204, 49, 
-        154, 259, 104, 209, 54, 159, 4, 109, 214, 59, 164, 9
+def obter_anjo_cabalistico(dia: int, mes: int) -> str:
+    # Matriz rigorosa de intervalos das 12 constelações e seus 72 gênios
+    tabela_anjos = [
+        # Áries
+        {"nome": "Vehuiah", "num": 1, "inicio": (20, 3), "fim": (24, 3)},
+        {"nome": "Jeliel", "num": 2, "inicio": (25, 3), "fim": (29, 3)},
+        {"nome": "Sitael", "num": 3, "inicio": (30, 3), "fim": (3, 4)},
+        {"nome": "Elemiah", "num": 4, "inicio": (4, 4), "fim": (8, 4)},
+        {"nome": "Mahasiah", "num": 5, "inicio": (9, 4), "fim": (13, 4)},
+        {"nome": "Lelahel", "num": 6, "inicio": (14, 4), "fim": (18, 4)},
+        # Touro
+        {"nome": "Achaiah", "num": 7, "inicio": (19, 4), "fim": (23, 4)},
+        {"nome": "Cahethel", "num": 8, "inicio": (24, 4), "fim": (28, 4)},
+        {"nome": "Haziel", "num": 9, "inicio": (29, 4), "fim": (3, 5)},
+        {"nome": "Aladiah", "num": 10, "inicio": (4, 5), "fim": (8, 5)},
+        {"nome": "Lauviah", "num": 11, "inicio": (9, 5), "fim": (13, 5)},
+        {"nome": "Hahaiah", "num": 12, "inicio": (14, 5), "fim": (18, 5)},
+        # Gêmeos
+        {"nome": "Iezalel", "num": 13, "inicio": (19, 5), "fim": (23, 5)},
+        {"nome": "Mebahel", "num": 14, "inicio": (24, 5), "fim": (28, 5)},
+        {"nome": "Hariel", "num": 15, "inicio": (29, 5), "fim": (2, 6)},
+        {"nome": "Hakamiah", "num": 16, "inicio": (3, 6), "fim": (7, 6)},
+        {"nome": "Lauviah", "num": 17, "inicio": (8, 6), "fim": (12, 6)},
+        {"nome": "Caliel", "num": 18, "inicio": (13, 6), "fim": (17, 6)},
+        # Câncer
+        {"nome": "Leuviah", "num": 19, "inicio": (18, 6), "fim": (22, 6)},
+        {"nome": "Pahaliah", "num": 20, "inicio": (23, 6), "fim": (27, 6)},
+        {"nome": "Nelchael", "num": 21, "inicio": (28, 6), "fim": (2, 7)},
+        {"nome": "Yeiayel", "num": 22, "inicio": (3, 7), "fim": (7, 7)},
+        {"nome": "Melahel", "num": 23, "inicio": (8, 7), "fim": (12, 7)},
+        {"nome": "Haheuiah", "num": 24, "inicio": (13, 7), "fim": (17, 7)},
+        # Leão
+        {"nome": "Nith-Haiah", "num": 25, "inicio": (18, 7), "fim": (22, 7)},
+        {"nome": "Haaiah", "num": 26, "inicio": (23, 7), "fim": (27, 7)},
+        {"nome": "Yerathel", "num": 27, "inicio": (28, 7), "fim": (1, 8)},
+        {"nome": "Seheiah", "num": 28, "inicio": (2, 8), "fim": (6, 8)},
+        {"nome": "Reyiel", "num": 29, "inicio": (7, 8), "fim": (12, 8)},
+        {"nome": "Omael", "num": 30, "inicio": (13, 8), "fim": (17, 8)},
+        # Virgem
+        {"nome": "Lecabel", "num": 31, "inicio": (18, 8), "fim": (23, 8)},
+        {"nome": "Vasariah", "num": 32, "inicio": (24, 8), "fim": (28, 8)},
+        {"nome": "Yehuiah", "num": 33, "inicio": (29, 8), "fim": (2, 9)},
+        {"nome": "Lehahiah", "num": 34, "inicio": (3, 9), "fim": (7, 9)},
+        {"nome": "Chavakhiah", "num": 35, "inicio": (8, 9), "fim": (12, 9)},
+        {"nome": "Menadel", "num": 36, "inicio": (13, 9), "fim": (17, 9)},
+        # Libra
+        {"nome": "Aniel", "num": 37, "inicio": (18, 9), "fim": (22, 9)},
+        {"nome": "Haamiah", "num": 38, "inicio": (23, 9), "fim": (27, 9)},
+        {"nome": "Rehael", "num": 39, "inicio": (28, 9), "fim": (2, 10)},
+        {"nome": "Ieiazel", "num": 40, "inicio": (3, 10), "fim": (7, 10)},
+        {"nome": "Hahahel", "num": 41, "inicio": (8, 10), "fim": (12, 10)},
+        {"nome": "Mikael", "num": 42, "inicio": (13, 10), "fim": (17, 10)},
+        # Escorpião
+        {"nome": "Veuliah", "num": 43, "inicio": (18, 10), "fim": (22, 10)},
+        {"nome": "Yelaiah", "num": 44, "inicio": (23, 10), "fim": (27, 10)},
+        {"nome": "Sealiah", "num": 45, "inicio": (28, 10), "fim": (1, 11)},
+        {"nome": "Ariel", "num": 46, "inicio": (2, 11), "fim": (6, 11)},
+        {"nome": "Asaliah", "num": 47, "inicio": (7, 11), "fim": (11, 11)},
+        {"nome": "Mihael", "num": 48, "inicio": (12, 11), "fim": (16, 11)},
+        # Sagitário
+        {"nome": "Vehuel", "num": 49, "inicio": (17, 11), "fim": (21, 11)},
+        {"nome": "Daniel", "num": 50, "inicio": (22, 11), "fim": (26, 11)},
+        {"nome": "Hahasiah", "num": 51, "inicio": (27, 11), "fim": (1, 12)},
+        {"nome": "Imamiah", "num": 52, "inicio": (2, 12), "fim": (6, 12)},
+        {"nome": "Nanael", "num": 53, "inicio": (7, 12), "fim": (11, 12)},
+        {"nome": "Nithael", "num": 54, "inicio": (12, 12), "fim": (16, 12)},
+        # Capricórnio
+        {"nome": "Mebahiah", "num": 55, "inicio": (17, 12), "fim": (21, 12)},
+        {"nome": "Poyel", "num": 56, "inicio": (22, 12), "fim": (26, 12)},
+        {"nome": "Nemamiah", "num": 57, "inicio": (27, 12), "fim": (31, 12)},
+        {"nome": "Yeialel", "num": 58, "inicio": (1, 1), "fim": (5, 1)},
+        {"nome": "Harahel", "num": 59, "inicio": (6, 1), "fim": (10, 1)},
+        {"nome": "Mitzrael", "num": 60, "inicio": (11, 1), "fim": (15, 1)},
+        # Aquário
+        {"nome": "Umabel", "num": 61, "inicio": (16, 1), "fim": (20, 1)},
+        {"nome": "Iah-Hel", "num": 62, "inicio": (21, 1), "fim": (25, 1)},
+        {"nome": "Anauel", "num": 63, "inicio": (26, 1), "fim": (30, 1)},
+        {"nome": "Mehiel", "num": 64, "inicio": (31, 1), "fim": (4, 2)},
+        {"nome": "Damabiah", "num": 65, "inicio": (5, 2), "fim": (9, 2)},
+        {"nome": "Manakel", "num": 66, "inicio": (10, 2), "fim": (14, 2)},
+        # Peixes
+        {"nome": "Eyael", "num": 67, "inicio": (15, 2), "fim": (19, 2)},
+        {"nome": "Habuhiah", "num": 68, "inicio": (20, 2), "fim": (24, 2)},
+        {"nome": "Rochel", "num": 69, "inicio": (25, 2), "fim": (29, 2)},
+        {"nome": "Jabamiah", "num": 70, "inicio": (1, 3), "fim": (5, 3)},
+        {"nome": "Haiaiel", "num": 71, "inicio": (6, 3), "fim": (10, 3)},
+        {"nome": "Mumiah", "num": 72, "inicio": (11, 3), "fim": (15, 3)}
     ]
-    kin_semente_ano = tabela_portadores[constante_ciclo]
-
-    data_ano_novo = datetime.date(ano_maia_sincronico, 7, 26)
-    try:
-        data_aniversario = datetime.date(a, m, d)
-    except ValueError:
-        data_aniversario = datetime.date(a, 2, 28)
     
-    if m == 2 and d == 29:
-        data_aniversario = datetime.date(a, 2, 28)
+    for anjo_alvo in tabela_anjos:
+        in_m, fi_m = anjo_alvo["inicio"][1], anjo_alvo["fim"][1]
+        in_d, fi_d = anjo_alvo["inicio"][0], anjo_alvo["fim"][0]
+        
+        if in_m == fi_m and mes == in_m and in_d <= dia <= fi_d:
+            return f"{anjo_alvo['nome']} ({anjo_alvo['num']}º Gênio Cabalístico)"
+        elif in_m != fi_m:
+            if (mes == in_m and dia >= in_d) or (mes == fi_m and dia <= fi_d):
+                return f"{anjo_alvo['nome']} ({anjo_alvo['num']}º Gênio Cabalístico)"
+                
+    return "Gênio da Humanidade (Nódulo Intercalares)"
 
-    dias_passados = (data_aniversario - data_ano_novo).days
 
-    if ano_maia_sincronico % 4 == 0 and data_ano_novo <= datetime.date(ano_maia_sincronico, 2, 29) <= data_aniversario:
-        dias_passados -= 1
-    elif a % 4 == 0 and data_ano_novo >= datetime.date(ano_maia_sincronico, 2, 29) >= data_aniversario:
-        dias_passados += 1
+def calcular_kin_maia(dia: int, mes: int, ano: int) -> tuple:
+    # Tratamento clássico do bissexto no Sincronário (0.0.Hunab Ku)
+    if mes == 2 and dia == 29:
+        dia = 28
 
-    # Modulação Absoluta de Sincronia
-    kin = (kin_semente_ano + dias_passados) % 260
+    # Algoritmo de constantes matemáticas puras indexadas por ano e mês gregoriano
+    # para conversão estável na matriz circular de 260 dias.
+    constantes_mes = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+    
+    # Cálculo invariável do fator do ano baseado nos ciclos de rotação do Tzolkin
+    fator_ano = (int((ano - 1) * 365.2425) + 2) % 260
+    
+    # Deslocamento total linear de dias
+    fator_mes = constantes_mes[mes]
+    total_dias = fator_ano + fator_mes + dia
+    
+    # Tratamento fino de bissexto para evitar o arrasto de dias intercalares gregorianos
+    if (ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)) and mes > 2:
+        total_dias += 1
+
+    kin = total_dias % 260
     if kin <= 0:
         kin += 260
-
-    # Ajuste do algoritmo para corrigir os desvios de KIN específicos das amostragem de dados
-    if a == 1979 and m == 4 and d == 14:
-        kin = 131
-
-    # CÁLCULO RESTRITO DO TOM: Base Fractal Vigésima Pura (Resto de 13)
+        
+    # Extração pura da Frequência Natural 13:20
     tom = kin % 13
     if tom == 0:
         tom = 13
@@ -145,15 +180,40 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
         "Terra Vermelha", "Espelho Branco", "Tormenta Azul", "Sol Amarelo"
     ]
     selo = selos_lista[(kin - 1) % 20]
+    
+    return kin, tom, selo
+
+
+def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -> dict:
+    d = int(str(dia_str).lstrip('0') or 0)
+    m = int(str(mes_str).lstrip('0') or 0)
+    a = int(ano_str)
+    
+    # ---------------------------------------------------------------------
+    # A. Signo Zodíaco (Calendário Gregoriano)
+    # ---------------------------------------------------------------------
+    signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
+              ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
+    signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
+    
+    # ---------------------------------------------------------------------
+    # B. Anjo Cabalístico (Mapeamento Dinâmico por Intervalos)
+    # ---------------------------------------------------------------------
+    anjo = obter_anjo_cabalistico(d, m)
 
     # ---------------------------------------------------------------------
-    # D. Numerologia Pitagórica
+    # C. Sincronário Maia (Conversão Tzolkin Unificada)
+    # ---------------------------------------------------------------------
+    kin, tom, selo = calcular_kin_maia(d, m, a)
+
+    # ---------------------------------------------------------------------
+    # D. Numerologia Pitagórica (Caminho de Vida & Expressão do Nome)
     # ---------------------------------------------------------------------
     red = lambda n: n if n in [11, 22] or n <= 9 else red(sum(int(x) for x in str(n)))
     destino = red(sum(int(x) for x in f"{d:02d}{m:02d}{a}" if x.isdigit()))
     
     tabela_pitagorica = {k: int(v) for k, v in "A1 B2 C3 D4 E5 F6 G7 H8 I9 J1 K2 L3 M4 N5 O6 P7 Q8 R9 S1 T2 U3 V4 W5 X6 Y7 Z8".split()}
-    expressao = red(sum(tabela_pitagorica.get(c, 0) for c in nome.upper()))
+    expressao = red(sum(tabela_pitagorica.get(c, 0) for c in nome.upper() if c in tabela_pitagorica))
 
     return {"kin": kin, "tom": tom, "selo": selo, "signo": signo, "anjo": anjo, "destino": destino, "expressao": expressao}
 
@@ -170,7 +230,7 @@ st.title("🌌 Sincro.app — Portal Metafísico")
 st.write("Insira seus dados para alinhar sua frequência geométrica com exatidão.")
 
 idioma = st.selectbox("Escolha o Idioma / Choose Language", ["pt", "en", "es"])
-nome = st.text_input("Nome Completo", value="")
+nome = st.text_input("Nome Completo (Conforme Certidão de Nascimento)", value="")
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -218,7 +278,7 @@ if st.button("Alinhar Portal Cósmico"):
                     st.success("✨ Portal Alinhado com Sucesso Absoluto!")
                     st.markdown(f"### 🔮 {ui['titulo']}: {int(dia):02d}/{int(mes):02d}/{ano}")
                     st.markdown(f"**👤 {ui['nome']}:** {nome}")
-                    st.markdown(f"** Perfil Maia:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
+                    st.markdown(f"**🌀 {ui['perfil']}:** KIN {meta['kin']} | Tom {meta['tom']} | Selo {meta['selo']}")
                     st.markdown(f"**✨ {ui['astros']}:** Signo: {meta['signo']} | Anjo: {meta['anjo']}")
                     st.markdown(f"**🔢 {ui['num']}:** Destino: {meta['destino']} | Expressão: {meta['expressao']}")
                     
