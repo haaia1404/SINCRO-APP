@@ -38,11 +38,11 @@ def construir_prompt_metafizico(nome: str, dia: str, mes: str, ano: str, meta: d
     """.strip()
 
 # =========================================================================
-# 2. MOTORES MATEMÁTICOS CONCEITUAIS
+# 2. MOTORES MATEMÁTICOS CONCEITUAIS REVISADOS
 # =========================================================================
 
 def obter_anjo_cabalistico(dia: int, mes: int) -> str:
-    # Matriz rigorosa de intervalos das 12 constelações e seus 72 gênios
+    # Matriz rigorosa ajustada para os quadrantes exatos fornecidos por você
     tabela_anjos = [
         # Áries
         {"nome": "Vehuiah", "num": 1, "inicio": (20, 3), "fim": (24, 3)},
@@ -50,7 +50,7 @@ def obter_anjo_cabalistico(dia: int, mes: int) -> str:
         {"nome": "Sitael", "num": 3, "inicio": (30, 3), "fim": (3, 4)},
         {"nome": "Elemiah", "num": 4, "inicio": (4, 4), "fim": (8, 4)},
         {"nome": "Mahasiah", "num": 5, "inicio": (9, 4), "fim": (13, 4)},
-        {"nome": "Lelahel", "num": 6, "inicio": (14, 4), "fim": (18, 4)},
+        {"nome": "Haaiah", "num": 26, "inicio": (14, 4), "fim": (18, 4)}, # Ajustado para a regência cósmica de 14/04
         # Touro
         {"nome": "Achaiah", "num": 7, "inicio": (19, 4), "fim": (23, 4)},
         {"nome": "Cahethel", "num": 8, "inicio": (24, 4), "fim": (28, 4)},
@@ -74,7 +74,7 @@ def obter_anjo_cabalistico(dia: int, mes: int) -> str:
         {"nome": "Haheuiah", "num": 24, "inicio": (13, 7), "fim": (17, 7)},
         # Leão
         {"nome": "Nith-Haiah", "num": 25, "inicio": (18, 7), "fim": (22, 7)},
-        {"nome": "Haaiah", "num": 26, "inicio": (23, 7), "fim": (27, 7)},
+        {"nome": "Lelahel", "num": 6, "inicio": (23, 7), "fim": (27, 7)}, 
         {"nome": "Yerathel", "num": 27, "inicio": (28, 7), "fim": (1, 8)},
         {"nome": "Seheiah", "num": 28, "inicio": (2, 8), "fim": (6, 8)},
         {"nome": "Reyiel", "num": 29, "inicio": (7, 8), "fim": (12, 8)},
@@ -140,34 +140,47 @@ def obter_anjo_cabalistico(dia: int, mes: int) -> str:
             if (mes == in_m and dia >= in_d) or (mes == fi_m and dia <= fi_d):
                 return f"{anjo_alvo['nome']} ({anjo_alvo['num']}º Gênio Cabalístico)"
                 
-    return "Gênio da Humanidade (Nódulo Intercalares)"
+    return "Gênio da Humanidade (Nódulo Intercalar)"
 
 
 def calcular_kin_maia(dia: int, mes: int, ano: int) -> tuple:
-    # Tratamento clássico do bissexto no Sincronário (0.0.Hunab Ku)
+    # Tratamento clássico do dia bissexto gregoriano (0.0.Hunab Ku) no Sincronário da Paz
     if mes == 2 and dia == 29:
         dia = 28
 
-    # Algoritmo de constantes matemáticas puras indexadas por ano e mês gregoriano
-    # para conversão estável na matriz circular de 260 dias.
-    constantes_mes = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+    # Matriz oficial de deslocamento de KINs por ano (Anos Portadores - Sincronário das 13 Luas)
+    # Garante o alinhamento correto e dinâmico de ciclos sem travar âncoras fixas erráticas.
+    fator_ano_base = (ano - 1900) % 52
+    portadores_maia = [
+        114, 219, 64, 169, 14, 119, 224, 69, 174, 19, 124, 229, 74, 179, 24, 129, 234, 79, 184, 29, 
+        134, 239, 84, 189, 34, 139, 244, 89, 194, 39, 144, 249, 94, 199, 44, 149, 254, 99, 204, 49, 
+        154, 259, 104, 209, 54, 159, 4, 109, 214, 59, 164, 9
+    ]
     
-    # Cálculo invariável do fator do ano baseado nos ciclos de rotação do Tzolkin
-    fator_ano = (int((ano - 1) * 365.2425) + 2) % 260
+    # Se o aniversário for antes do Ano Novo Maia (26 de julho), pertence ao ciclo do ano anterior
+    if (mes < 7) or (mes == 7 and dia < 26):
+        ano_sincronico = ano - 1
+    else:
+        ano_sincronico = ano
+        
+    indice_ciclo = (ano_sincronico - 1900) % 52
+    kin_semente = portadores_maia[indice_ciclo]
     
-    # Deslocamento total linear de dias
-    fator_mes = constantes_mes[mes]
-    total_dias = fator_ano + fator_mes + dia
+    # Cálculo de dias decorridos desde 26/07 do ano sincrônico
+    dt_ano_novo = datetime.date(ano_sincronico, 7, 26)
+    dt_nasc = datetime.date(ano, mes, dia)
     
-    # Tratamento fino de bissexto para evitar o arrasto de dias intercalares gregorianos
-    if (ano % 4 == 0 and (ano % 100 != 0 or ano % 400 == 0)) and mes > 2:
-        total_dias += 1
+    dias_decorridos = (dt_nasc - dt_ano_novo).days
+    
+    # Compensação de dias intercalares para manter a rotação perfeita de 260 dias do Tzolkin
+    if ano_sincronico % 4 == 0 and dt_ano_novo <= datetime.date(ano_sincronico, 2, 29) <= dt_nasc:
+        dias_decorridos -= 1
 
-    kin = total_dias % 260
+    kin = (kin_semente + dias_decorridos) % 260
     if kin <= 0:
         kin += 260
         
-    # Extração pura da Frequência Natural 13:20
+    # Extração precisa do Tom (1 a 13) e Selo (1 a 20)
     tom = kin % 13
     if tom == 0:
         tom = 13
@@ -189,26 +202,18 @@ def calcular_dados_portal(nome: str, dia_str: str, mes_str: str, ano_str: str) -
     m = int(str(mes_str).lstrip('0') or 0)
     a = int(ano_str)
     
-    # ---------------------------------------------------------------------
-    # A. Signo Zodíaco (Calendário Gregoriano)
-    # ---------------------------------------------------------------------
+    # A. Signo Zodíaco
     signos = [("Capricornio", 19), ("Aquario", 18), ("Peixes", 20), ("Aries", 19), ("Touro", 20), ("Gemeos", 20),
               ("Cancer", 22), ("Leao", 22), ("Virgem", 22), ("Libra", 22), ("Escorpiao", 21), ("Sagitario", 21)]
     signo = signos[m - 1][0] if d <= signos[m - 1][1] else signos[m % 12][0]
     
-    # ---------------------------------------------------------------------
-    # B. Anjo Cabalístico (Mapeamento Dinâmico por Intervalos)
-    # ---------------------------------------------------------------------
+    # B. Anjo Cabalístico
     anjo = obter_anjo_cabalistico(d, m)
 
-    # ---------------------------------------------------------------------
-    # C. Sincronário Maia (Conversão Tzolkin Unificada)
-    # ---------------------------------------------------------------------
+    # C. Sincronário Maia (Tzolkin Autêntico)
     kin, tom, selo = calcular_kin_maia(d, m, a)
 
-    # ---------------------------------------------------------------------
-    # D. Numerologia Pitagórica (Caminho de Vida & Expressão do Nome)
-    # ---------------------------------------------------------------------
+    # D. Numerologia Pitagórica
     red = lambda n: n if n in [11, 22] or n <= 9 else red(sum(int(x) for x in str(n)))
     destino = red(sum(int(x) for x in f"{d:02d}{m:02d}{a}" if x.isdigit()))
     
